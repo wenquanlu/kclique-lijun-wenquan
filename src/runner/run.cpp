@@ -41,7 +41,7 @@ int main(int argc, char * argv[])
     if(deb == 0) {
         Graph * g = new Graph();
         v_size n, maxK, tmp;
-        double exCnt = 0.0;
+        double exCnt = 0.0; // this is the external count accurate count
 
         FILE * f = fopen((filePath+"s.txt").c_str(), "r");
         int err = fscanf(f, "%u", &n);
@@ -63,7 +63,7 @@ int main(int argc, char * argv[])
 
         if(aC->exist("-cc")) 
             pt->runCC(k, deb, exCnt, alpha, N);
-        else if(aC->exist("-cccpath"))
+        else if(aC->exist("-cccpath")) // here very important!!!!!!, this path is the k-1 color path method
             pt->runCCPath(k, deb, exCnt, alpha, N);
         else
             pt->run(k, deb, exCnt, alpha, N);

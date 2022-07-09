@@ -19,7 +19,7 @@ using std::vector;
 // constexpr v_size batchSize = 50;
 
 struct cccpath {
-    v_size sz;
+    v_size sz; //sz is the size of S
     Graph * g;
     hopstotchHash * hashTable;
     v_size k;
@@ -47,8 +47,8 @@ struct cccpath {
         //     return g->color[a] > g->color[b];
         // };
         
-        for(v_size i = 0; i < sz; i++) {
-            v_size u = nodes[i];
+        for(v_size i = 0; i < sz; i++) { // for each node in s
+            v_size u = nodes[i]; // guess nodes represent S
 
             // sortByColor = g->pEdge + g->pIdx2[u];
 
@@ -56,23 +56,27 @@ struct cccpath {
             //     sortByColor + g->pIdx[u + 1] - g->pIdx2[u], cmp);
             // sortGraph(u);
             
-            memset(pColor, 0, sizeof(v_size)*(g->cc+1));
+            memset(pColor, 0, sizeof(v_size)*(g->cc+1)); // pColor = {0,0,0,0,0,0,0,...,0}
             v_size deg = g->pIdx[u+1] - g->pIdx2[u];
             for(v_size i = 0; i < deg; i++) {
-                pColor[g->color[g->pEdge[g->pIdx2[u] + i]] + 1]++;
+                pColor[g->color[g->pEdge[g->pIdx2[u] + i]] + 1]++; // for each out-neighbour of u
+                // set its corresponding color place in pColor 1 
+                // e.g. neighbours with colors 0,1,3, then pColor is {0,1,1,0,1,0...}
             }
 
             for(v_size i = 1; i < g->cc; i++) {
-                pColor[i] += pColor[i - 1];
+                pColor[i] += pColor[i - 1]; // get the cumulative {0,1,2,2,3,3...}
             }
 
             for(v_size i = 0; i < deg; i++) {
-                v_size v = g->pEdge[g->pIdx2[u] + i];
-                sortByColor[ pColor[g->color[v]]++ ] = v;
+                v_size v = g->pEdge[g->pIdx2[u] + i]; // v is each out-neighbour of u
+                sortByColor[ pColor[g->color[v]]++ ] = v; //sortByColor is sorted list of out-neighours of u by color
+                // {1212,9302,142,3802,...} by color
             }
-
+            
             memcpy(g->pEdge + g->pIdx2[u], sortByColor, sizeof(v_size)*deg);
-
+            // important step!!! now g->pEdge outneighbours of u are sorted by color!!!! In order #####
+            // g->pEdge has same content as sortByColor
             computeDP(u);
 
             double sumD = 0.0;
@@ -80,7 +84,7 @@ struct cccpath {
                 sumD += dp[i][k];
             }
 
-            experiments[i] = sumD;
+            experiments[i] = sumD; // experiments[i] stores the total number of k-paths in the graph sum(dp[i][k])
             sumW += sumD;
         }
 
@@ -157,44 +161,62 @@ struct cccpath {
         v_size outDegree = g->pIdx[u+1] - g->pIdx2[u];
         pIdx[0] = 0;
         for(v_size i = 0; i < outDegree; i++) {
-            v_size v = sortByColor[i];
-            pIdx[i + 1] = pIdx[i]; 
+            v_size v = sortByColor[i]; // this is the v_i
+            pIdx[i + 1] = pIdx[i]; // step up from previous entry
 
             for(v_size j = i + 1; j < outDegree; j++) {
                 v_size w = sortByColor[j];
 // assert(g->color[v] > g->color[w]);
                 if(g->color[v] == g->color[w]) continue;
                 if(hashTable[v].contain(w)) {
+                // if there is an edge from v to w
+                
 // assert(g->color[v] > g->color[w]);
-                    pEdge[pIdx[i + 1]++] = j;
+
+                    //////////////////////////////Important/////////////////////////
+                    // ++ because number of increments represent number of outgoingedges of v, hence the gap in pIdx
+                
+                    pEdge[pIdx[i + 1]++] = j; // Here constructs the local pEdge!!!!, so the value is a corresponding node in local index
                 }
             }
         }
 
+        // After above steps
+        // pEdge is populated with nodes in local index
+        // pIdx is linked to pEdge
+        // pIdx is in the same order as the nodes in SortByColor
+
+        // below are real DP process described in the algorithm
         for(v_size j = 2; j <= k; j++) {
             for(v_size i = 0; i < outDegree; i++) {
                 dp[i][j] = 0.0;
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
+                    // for out-neighbour of v_i 
+                    // a out-neighbour is pEdge[l]
+
                     dp[i][j] += dp[pEdge[l]][j - 1];
                 }
             }
         }
     }
 
+    // sortByColor a mapping of rank v_i to actual node id (the value of entry)
     int sampleOneTime(v_size id, v_size u, 
-        std::uniform_real_distribution<double> & d) {
+        std::uniform_real_distribution<double> & d) { // uiDistribution(0, 1);
         v_size preId = -1;
 
         double sumD = experiments[id];
-        double x = d(e);
+        double x = d(e); // get a random double
         
         double sumTmp = 0.0;
-        v_size deg = g->pIdx[u+1] - g->pIdx2[u];
+        v_size deg = g->pIdx[u+1] - g->pIdx2[u]; // out degree of node u
+
+        // This is to select the first node, "the start node" of the clique
         for(v_size i = 0; i < deg; i++) {
             sumTmp += dp[i][k];
             if(sumTmp + 1e-10 >= x * sumD) {
                 clique[0] = sortByColor[ i ];
-                preId = i;
+                preId = i; //preId is the start node Id, a node in S
                 break;
             }
         }
@@ -202,15 +224,15 @@ struct cccpath {
         for(v_size i = 1; i < k; i++) {
             sumTmp = sumD = 0.0;
             for(v_size j = pIdx[preId]; j < pIdx[preId + 1]; j++) {
-                sumD += dp[pEdge[j]][k - i];
+                sumD += dp[pEdge[j]][k - i]; // sumD is cnt in the pseudocode
             }
 // bool f = false;
-            x = d(e);
-            for(v_size j = pIdx[preId]; j < pIdx[preId + 1]; j++) {
+            x = d(e); // sample again
+            for(v_size j = pIdx[preId]; j < pIdx[preId + 1]; j++) { // pEdge[j] is each neighbour node, this iterates over neighbour of preId node
                 sumTmp += dp[pEdge[j]][k - i];
                 if(sumTmp + 1e-10 >= x * sumD) {
-                    clique[i] = sortByColor[ pEdge[j] ];
-                    preId = pEdge[j];
+                    clique[i] = sortByColor[ pEdge[j] ]; // sortByColor[ pEdge[j] ] this is the actual id of v_j, retrieves the global node index
+                    preId = pEdge[j]; 
 // f = true;
                     break;
                 }

@@ -1,0 +1,6 @@
+
+change computeDP
+
+Still need the first half of computeDP
+As it needs to identify its neighbours in the subgraph
+in anyway it needs to build an adjacency list representation 

@@ -31,7 +31,7 @@ public:
     v_size degeneracy = 0;
 
     v_size *degNum = nullptr;
-    v_size * color = nullptr, cc = 0;
+    v_size * color = nullptr, cc = 0; // cc is a number; color is an array of size vCnt, each entry represents color of a node 
     // multiThreads * threadController;
     v_size *partitionOffset = nullptr;
 
@@ -79,7 +79,8 @@ public:
         degeneracy = 0;
         outDegSum = 0;
         for(v_size i = 0; i < vCnt; i++) {
-            while(pIdx2[i] < pIdx[i + 1] && pEdge[pIdx2[i]] < i) pIdx2[i]++;
+            while(pIdx2[i] < pIdx[i + 1] && pEdge[pIdx2[i]] < i) pIdx2[i]++; /* while pIdx2 smaller than the upper
+            index boundary of this node, and the neighbour node is less than this node */
             if(pIdx[i + 1] < pIdx2[i]) {
                 printf("error pIdx2 %u\n", i);
                 continue;
@@ -211,7 +212,7 @@ public:
     }
 
     void colorG() {
-        color = new v_size[vCnt]();//0-cc
+        color = new v_size[vCnt]();//value in color[] are 0 to cc, cc is the color upper bound
         v_size *f = new v_size[maxDeg]();
         
         cc = 0;
