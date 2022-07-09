@@ -12,11 +12,20 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <unordered_map>
 
 using Pair = std::pair<v_size, v_size>;
 using std::vector;
+using std::unordered_map;
 
 // constexpr v_size batchSize = 50;
+
+template <typename Container> // we can make this generic for any container [1]
+struct container_hash {
+    std::size_t operator()(Container const& c) const {
+        return boost::hash_range(c.begin(), c.end());
+    }
+};
 
 struct cccpath {
     v_size sz; //sz is the size of S
@@ -24,9 +33,12 @@ struct cccpath {
     hopstotchHash * hashTable;
     v_size k;
     double * experiments;
+    u_int64_t * exp;
     double sumW;
     double ** dp;
     double * memoryPool = nullptr;
+    u_int64_t suW;
+    u_int64_t * c;
 
     v_size * pEdge = nullptr;
     v_size * pIdx = nullptr;
@@ -37,6 +49,7 @@ struct cccpath {
     v_size * clique = nullptr;
     std::default_random_engine e;
     e_size N = 5000000;
+    unordered_map<vector<v_size>, u_int64_t, container_hash<v_size>> dpm;
 
     void init(v_size sz_, std::vector<v_size> & nodes, e_size N_=5000000) {
         sz = sz_;
@@ -79,25 +92,35 @@ struct cccpath {
             // g->pEdge has same content as sortByColor
             computeDP(u);
 
-            double sumD = 0.0;
-            for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
+            //double sumD = 0.0;
+            uint64_t suD = 0;
+            /*for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
                 sumD += dp[i][k];
+            }*/
+
+            for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
+                for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
+                    suD += dpm[{i, pEdge[l], k}];
+                }
             }
 
-            experiments[i] = sumD; // experiments[i] stores the total number of k-paths in the graph sum(dp[i][k])
-            sumW += sumD;
+            //experiments[i] = sumD; // experiments[i] stores the total number of k-paths in the graph sum(dp[i][k])
+            exp[i] = suD;
+            suW += suD;
+            //sumW += sumD; // sumW is the total number of k-paths in S
         }
 
         delete [] sortByColor;
     }
 
+    // careful, k here is k - 1
     void initForSingleNode(v_size k_, Graph * g_, hopstotchHash * hashTable_) {
         k = k_;
         g = g_;
         hashTable = hashTable_;
         sumW = 0.0;
         clique = new v_size[k];
-
+/*
         dp = new double*[g->degeneracy];
         memoryPool = new double[g->degeneracy * (k+1)]();
         v_size p = 0;
@@ -110,7 +133,7 @@ struct cccpath {
             dp[i][0] = 0;
             dp[i][1] = 1;
         }
-
+*/
         pEdge = new v_size[g->degeneracy*g->degeneracy];
         pIdx = new v_size[g->degeneracy + 1];
         sortByColor = new v_size[g->degeneracy + 1];
@@ -187,6 +210,37 @@ struct cccpath {
         // pIdx is in the same order as the nodes in SortByColor
 
         // below are real DP process described in the algorithm
+
+        for (v_size i = 0; i < outDegree; i++) {
+            for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
+                    dpm[{i, pEdge[l], 1}] = 1;
+                }
+        }
+
+        for (v_size j = 2; j <= k; j++) {
+            for (v_size i = 0; i < outDegree; i++) {
+                for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
+                    v_size x = pEdge[l];
+                    for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
+                        v_size t = pEdge[p];
+                        if (dpm[{i, t, 1}] == 1) {
+                            dpm[{i, x, j}] = dpm[{i, x, j}] + dpm[{x, t, j-1}];
+                        }
+                    }
+                }
+            }
+        }
+
+
+        for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
+            c[i] = 0;
+            for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
+                c[i] += dpm[{i, pEdge[l], k}];
+            }
+        }
+
+
+/*    
         for(v_size j = 2; j <= k; j++) {
             for(v_size i = 0; i < outDegree; i++) {
                 dp[i][j] = 0.0;
@@ -198,21 +252,77 @@ struct cccpath {
                 }
             }
         }
+*/
     }
 
     // sortByColor a mapping of rank v_i to actual node id (the value of entry)
     int sampleOneTime(v_size id, v_size u, 
         std::uniform_real_distribution<double> & d) { // uiDistribution(0, 1);
         v_size preId = -1;
+        v_size prId = -1;
 
         double sumD = experiments[id];
         double x = d(e); // get a random double
+
+        uint64_t suD = exp[id];
+        
         
         double sumTmp = 0.0;
+        uint64_t sumT = 0;
         v_size deg = g->pIdx[u+1] - g->pIdx2[u]; // out degree of node u
 
+        v_size last;
+        v_size secLast;
+
+        for (v_size i = 0; i < k; i++) {
+            if (i == 0) {
+                for (v_size j = 0; j < deg; j++) {
+                    sumT += c[j];
+                    if (sumT + 1e-10 >= x * suD) {
+                        clique[0] = sortByColor[ j ];
+                        prId = j;
+                        break;
+                    }
+                }
+            } else if (i == 1) {
+                sumT = 0;
+                suD = c[last];
+                for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
+                    sumT += dpm[{last, j, k-1}];
+                    if (sumT + 1e-10 >= x * suD) {
+                        clique[1] = sortByColor[ pEdge[j] ];
+                        prId = pEdge[j];
+                        break;
+                    }
+                }
+            } else {
+                sumT = 0;
+                suD = dpm[{secLast, last, k - i + 1}];
+                for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
+                    sumT += dpm[{last, j, k-i}];
+                    if (sumT + 1e-10 >= x * suD) {
+                        clique[i] = sortByColor[ pEdge[j] ];
+                        prId = pEdge[j];
+                        break;
+                    }
+                }
+
+            }
+
+            for(v_size j = 0; j < i-1; j++) {
+                if(!connect(clique[i], clique[j])) {
+                    return 0;
+                }
+            }
+
+            secLast = last;
+            last = prId;    
+        }
+
+
+
         // This is to select the first node, "the start node" of the clique
-        for(v_size i = 0; i < deg; i++) {
+        /*for (v_size i = 0; i < deg; i++) {
             sumTmp += dp[i][k];
             if(sumTmp + 1e-10 >= x * sumD) {
                 clique[0] = sortByColor[ i ];
@@ -243,7 +353,7 @@ struct cccpath {
                     return 0;
                 }
             }
-        }
+        }*/
         
         return 1;
     }
@@ -261,9 +371,11 @@ struct cccpath {
             e_size expectedSampleTime
                 = std::round(sampleTimes * (experiments[i] / sumW) + 0.000001);
 
-            
+            // expected SampleTime is the expected sample time for sampling around node u
 
             if(expectedSampleTime == 0) continue;
+
+            c = new u_int64_t[g->pIdx[u+1] - g->pIdx2[u]];
 
             sortByColor = g->pEdge + g->pIdx2[u];
             // sortGraph(u);
@@ -282,7 +394,7 @@ struct cccpath {
             std::discrete_distribution<int> 
               udistribution(experiments, experiments + sz);
 printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
-              while(sampleTotalTimes < sampleTimes) {
+              while(sampleTotalTimes < sampleTimes) { // if sample number not met target, pick ones following the distribution
                   int id = udistribution(generator);
                   v_size u = nodes[id];
                   sortByColor = g->pEdge + g->pIdx2[u];
@@ -300,6 +412,7 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
         // printf("sample rate %f\n", 1.0 * t / sampleTimes);
         printf("| %.6f %u %u", 1.0 * t / sampleTotalTimes, t, sampleTotalTimes);
         // printf("| %.8f", expectedN / sumW);
+        if(c != nullptr) delete [] c;
         return 1.0 * t / sampleTotalTimes * sumW;
         //return ans;
     }
