@@ -184,6 +184,7 @@ struct cccpath {
     }
     
     void computeDP(v_size u) {
+        printf("u: %u\n", u);
         v_size outDegree = g->pIdx[u+1] - g->pIdx2[u];
         pIdx[0] = 0;
         for(v_size i = 0; i < outDegree; i++) {
@@ -386,6 +387,7 @@ struct cccpath {
             }
 
             printf("si: %u\n", i);
+            fflush(stdout);
 
             v_size tt = 0;
             for(v_size j = 0; j < expectedSampleTime; j++) {
