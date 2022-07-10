@@ -280,6 +280,7 @@ struct cccpath {
         for (v_size i = 0; i < k; i++) {
             x = d(e);
             printf("x is %.4f\n", x);
+            printf("suD: %.0f\n", suD);
             if (i == 0) {
                 for (v_size j = 0; j < deg; j++) {
                     sumT += c[j];
