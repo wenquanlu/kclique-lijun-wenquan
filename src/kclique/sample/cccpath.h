@@ -362,6 +362,7 @@ struct cccpath {
         double ans = 0.0;
 
         for(v_size i = 0; i < sz; i++) {
+            printf("shead: %u", i);
             v_size u = nodes[i];
 
             //e_size expectedSampleTime
