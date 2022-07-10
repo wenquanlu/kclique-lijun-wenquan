@@ -50,7 +50,7 @@ struct cccpath {
     v_size * clique = nullptr;
     std::default_random_engine e;
     e_size N = 5000000;
-    unordered_map<vector<v_size>, u_int64_t, container_hash<v_size>> dpm;
+    unordered_map<vector<v_size>, u_int64_t, container_hash<vector<v_size>>> dpm;
 
     void init(v_size sz_, std::vector<v_size> & nodes, e_size N_=5000000) {
         sz = sz_;
