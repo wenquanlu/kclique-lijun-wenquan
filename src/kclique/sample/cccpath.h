@@ -111,7 +111,7 @@ struct cccpath {
             suW += suD;
             //sumW += sumD; // sumW is the total number of k-paths in S
         }
-
+        printf("finished those loops");
         delete [] sortByColor;
     }
 
