@@ -302,6 +302,7 @@ struct cccpath {
                 }
             } else {
                 sumT = 0;
+                printf("secLast: %u, last: %u\n", secLast, last);
                 suD = dpm[{secLast, last, k - i + 1}];
                 printf("suD: %.0f\n", suD);
                 for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
