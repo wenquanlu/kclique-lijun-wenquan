@@ -443,7 +443,7 @@ printf("|%u| %.1f| %lu", k, alpha, N);
         cccpath * scpObj = new cccpath();
         scpObj->initForSingleNode(k-1, g, hashTable);
         scpObj->init(sz, nodes); // nodes is S
-        printf("initialisation done");
+        printf("initialisation done\n");
         double sampleCnt_ = scpObj->sample(nodes, N, exCnt - exactCnt);
         // double sampleCntMultiLayer = scpObj->sampleMultilayer(nodes, N);
         
