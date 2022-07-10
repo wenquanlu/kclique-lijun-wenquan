@@ -440,7 +440,6 @@ printf("|%u| %.1f| %lu", k, alpha, N);
 
     // here uses sample count
     if(sz > 0) {//cccpath
-        printf("hi i AM HERE");
         cccpath * scpObj = new cccpath();
         scpObj->initForSingleNode(k-1, g, hashTable);
         scpObj->init(sz, nodes); // nodes is S
