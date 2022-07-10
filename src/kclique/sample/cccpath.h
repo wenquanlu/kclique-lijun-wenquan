@@ -56,6 +56,7 @@ struct cccpath {
         sz = sz_;
         N = N_;
         experiments = new double[sz];
+        exp = new u_int64_t[sz];
 
         // auto cmp = [&](v_size a, v_size b) {
         //     return g->color[a] > g->color[b];
@@ -169,6 +170,7 @@ struct cccpath {
 
     ~cccpath() {
         if(experiments != nullptr) delete [] experiments;
+        if (exp != nullptr) delete [] exp;
         if(memoryPool != nullptr) delete [] memoryPool;
         if(dp != nullptr) delete [] dp;
         if(pEdge != nullptr) delete [] pEdge;
@@ -362,9 +364,9 @@ struct cccpath {
         for(v_size i = 0; i < sz; i++) {
             v_size u = nodes[i];
 
-            e_size expectedSampleTime
-                = std::round(sampleTimes * (experiments[i] / sumW) + 0.000001);
-
+            //e_size expectedSampleTime
+                //= std::round(sampleTimes * (experiments[i] / sumW) + 0.000001);
+            e_size expectedSampleTime = std::round(sampleTimes * (exp[i] / sumW) + 0.000001);
             // expected SampleTime is the expected sample time for sampling around node u
 
             if(expectedSampleTime == 0) continue;
@@ -388,14 +390,16 @@ struct cccpath {
                 tt += sampleOneTime(i, u, uiDistribution);
             }
             t += tt;
-            ans += 1.0*tt/expectedSampleTime*experiments[i];
+            //ans += 1.0*tt/expectedSampleTime*experiments[i];
+            ans += 1.0*tt/expectedSampleTime*exp[i];
             sampleTotalTimes += expectedSampleTime;
             if(c != nullptr) delete [] c;
         }
         
         if(sampleTotalTimes < sampleTimes) {
-            std::discrete_distribution<int> 
-              udistribution(experiments, experiments + sz);
+            //std::discrete_distribution<int> 
+              //udistribution(experiments, experiments + sz);
+            std::discrete_distribution<int> udistribution(exp, exp + sz);
 printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
               while(sampleTotalTimes < sampleTimes) { // if sample number not met target, pick ones following the distribution
                   int id = udistribution(generator);
