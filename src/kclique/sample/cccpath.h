@@ -121,6 +121,7 @@ struct cccpath {
         g = g_;
         hashTable = hashTable_;
         sumW = 0.0;
+        suW = 0;
         clique = new v_size[k];
 /*
         dp = new double*[g->degeneracy];
@@ -368,9 +369,9 @@ struct cccpath {
             //printf("j %u\n", u);
             //e_size expectedSampleTime
                 //= std::round(sampleTimes * (experiments[i] / sumW) + 0.000001);
-            e_size expectedSampleTime = std::round(sampleTimes * (exp[i] / sumW) + 0.000001);
+            e_size expectedSampleTime = std::round(sampleTimes * (exp[i] / suW) + 0.000001);
             // expected SampleTime is the expected sample time for sampling around node u
-            printf("exp s t: %u | exp: %u | sumW: %u\n", expectedSampleTime, exp[i], sumW);
+            printf("exp s t: %u | exp: %u | sumW: %u\n", expectedSampleTime, exp[i], suW);
             if(expectedSampleTime == 0) continue;
 
             c = new u_int64_t[g->pIdx[u+1] - g->pIdx2[u]];
@@ -436,7 +437,8 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
         printf("| %.6f %u %u", 1.0 * t / sampleTotalTimes, t, sampleTotalTimes);
         // printf("| %.8f", expectedN / sumW);
         if(c != nullptr) delete [] c;
-        return 1.0 * t / sampleTotalTimes * sumW;
+        //return 1.0 * t / sampleTotalTimes * sumW;
+        return 1.0 * t / sampleTotalTimes * suW;
         //return ans;
     }
 };
