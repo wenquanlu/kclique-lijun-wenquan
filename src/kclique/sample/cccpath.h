@@ -259,7 +259,7 @@ struct cccpath {
         v_size prId = -1;
 
         double sumD = experiments[id];
-        double x = d(e); // get a random double
+        double x = -1; // get a random double
 
         uint64_t suD = exp[id];
         
@@ -272,6 +272,7 @@ struct cccpath {
         v_size secLast;
 
         for (v_size i = 0; i < k; i++) {
+            x = d(e)
             if (i == 0) {
                 for (v_size j = 0; j < deg; j++) {
                     sumT += c[j];
@@ -285,7 +286,7 @@ struct cccpath {
                 sumT = 0;
                 suD = c[last];
                 for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
-                    sumT += dpm[{last, j, k-1}];
+                    sumT += dpm[{last, pEdge[j], k-1}];
                     if (sumT + 1e-10 >= x * suD) {
                         clique[1] = sortByColor[ pEdge[j] ];
                         prId = pEdge[j];
@@ -296,7 +297,7 @@ struct cccpath {
                 sumT = 0;
                 suD = dpm[{secLast, last, k - i + 1}];
                 for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
-                    sumT += dpm[{last, j, k-i}];
+                    sumT += dpm[{last, pEdge[j], k-i}];
                     if (sumT + 1e-10 >= x * suD) {
                         clique[i] = sortByColor[ pEdge[j] ];
                         prId = pEdge[j];
