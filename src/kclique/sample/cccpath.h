@@ -276,7 +276,7 @@ struct cccpath {
         }
         printf("deg: %u\n", deg);
 
-        for (int i = 0; i < k; i++) {
+        for (v_size i = 0; i < k; i++) {
             x = d(e);
             if (i == 0) {
                 for (v_size j = 0; j < deg; j++) {
@@ -315,14 +315,16 @@ struct cccpath {
 
             }
 
-            for(int j = 0; j < i-1; j++) {
-                printf("i: %u, j: %u\n", i, j);
-                printf("clique[i]: %u, clique[j]: %u\n", clique[i], clique[j]);
-                if(!connect(clique[i], clique[j])) {
-                    return 0;
+            if (i >= 1) {
+                for(int j = 0; j < i-1; j++) {
+                    printf("i: %u, j: %u\n", i, j);
+                    printf("clique[i]: %u, clique[j]: %u\n", clique[i], clique[j]);
+                    if(!connect(clique[i], clique[j])) {
+                        return 0;
+                    }
                 }
             }
-
+            
             secLast = last;
             last = prId;    
         }
