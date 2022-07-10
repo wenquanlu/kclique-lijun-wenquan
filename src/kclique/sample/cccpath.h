@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <random>
 #include <unordered_map>
+#include <boost/functional/hash.hpp>
 
 using Pair = std::pair<v_size, v_size>;
 using std::vector;
