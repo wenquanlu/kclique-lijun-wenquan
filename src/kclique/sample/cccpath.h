@@ -233,13 +233,6 @@ struct cccpath {
         }
 
 
-        for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
-            c[i] = 0;
-            for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                c[i] += dpm[{i, pEdge[l], k}];
-            }
-        }
-
 
 /*    
         for(v_size j = 2; j <= k; j++) {
@@ -382,6 +375,14 @@ struct cccpath {
             // sortGraph(u);
             computeDP(u);
 
+            // first mistake made
+            for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
+                c[i] = 0;
+                for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
+                    c[i] += dpm[{i, pEdge[l], k}];
+                }
+            }
+
             v_size tt = 0;
             for(v_size j = 0; j < expectedSampleTime; j++) {
                 tt += sampleOneTime(i, u, uiDistribution);
@@ -403,6 +404,14 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
                   // sortGraph(u);
                   c = new u_int64_t[g->pIdx[u+1] - g->pIdx2[u]];
                   computeDP(u);
+
+                  for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
+                      c[i] = 0;
+                      for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
+                          c[i] += dpm[{i, pEdge[l], k}];
+                      }
+                  }
+
                   t += sampleOneTime(id, u, uiDistribution);
                   sampleTotalTimes++;
                   if(c != nullptr) delete [] c;
