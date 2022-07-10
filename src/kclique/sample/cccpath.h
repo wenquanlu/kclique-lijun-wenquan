@@ -411,6 +411,7 @@ struct cccpath {
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
                     c[i] += dpm[{i, pEdge[l], k}];
                 }
+                printf("c[%u]: %u\n", c[i]);
             }
 
             //printf("si: %u\n", i);
