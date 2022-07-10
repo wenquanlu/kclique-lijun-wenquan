@@ -272,7 +272,7 @@ struct cccpath {
         v_size secLast;
 
         for (v_size i = 0; i < k; i++) {
-            x = d(e)
+            x = d(e);
             if (i == 0) {
                 for (v_size j = 0; j < deg; j++) {
                     sumT += c[j];
