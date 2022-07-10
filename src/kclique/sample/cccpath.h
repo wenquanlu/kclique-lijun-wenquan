@@ -311,6 +311,7 @@ struct cccpath {
             }
 
             for(v_size j = 0; j < i-1; j++) {
+                printf("j: %u, i: %u\n", j, i);
                 if(!connect(clique[i], clique[j])) {
                     return 0;
                 }
