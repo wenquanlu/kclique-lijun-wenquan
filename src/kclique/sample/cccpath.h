@@ -64,7 +64,7 @@ struct cccpath {
         
         for(v_size i = 0; i < sz; i++) { // for each node in s
             v_size u = nodes[i]; // guess nodes represent S
-
+            printf("u: %u\n", u);
             // sortByColor = g->pEdge + g->pIdx2[u];
 
             // std::sort(sortByColor,
@@ -184,7 +184,6 @@ struct cccpath {
     }
     
     void computeDP(v_size u) {
-        printf("u: %u\n", u);
         v_size outDegree = g->pIdx[u+1] - g->pIdx2[u];
         pIdx[0] = 0;
         for(v_size i = 0; i < outDegree; i++) {
