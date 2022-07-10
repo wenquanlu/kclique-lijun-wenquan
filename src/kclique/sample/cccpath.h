@@ -385,6 +385,8 @@ struct cccpath {
                 }
             }
 
+            printf("si: %u", i);
+
             v_size tt = 0;
             for(v_size j = 0; j < expectedSampleTime; j++) {
                 tt += sampleOneTime(i, u, uiDistribution);
