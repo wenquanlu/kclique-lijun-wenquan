@@ -271,7 +271,7 @@ struct cccpath {
         v_size last;
         v_size secLast;
 
-        for (v_size i = 0; i < k; i++) {
+        for (int i = 0; i < k; i++) {
             x = d(e);
             if (i == 0) {
                 for (v_size j = 0; j < deg; j++) {
@@ -310,7 +310,7 @@ struct cccpath {
 
             }
 
-            for(v_size j = 0; j < i-1; j++) {
+            for(int j = 0; j < i-1; j++) {
                 printf("j: %u, i: %u\n", j, i);
                 if(!connect(clique[i], clique[j])) {
                     return 0;
