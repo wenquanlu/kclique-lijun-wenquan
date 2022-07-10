@@ -273,6 +273,7 @@ struct cccpath {
 
         for (int i = 0; i < deg; i++) {
             printf("%u: %u\n", i , sortByColor[i]);
+            printf("c[i]: %.0f\n", c[i]);
         }
         printf("deg: %u\n", deg);
 
