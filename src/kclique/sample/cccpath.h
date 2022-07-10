@@ -368,7 +368,7 @@ struct cccpath {
 
         for(v_size i = 0; i < sz; i++) {
             v_size u = nodes[i];
-            printf("j %u\n", u);
+            //printf("j %u\n", u);
             //e_size expectedSampleTime
                 //= std::round(sampleTimes * (experiments[i] / sumW) + 0.000001);
             e_size expectedSampleTime = std::round(sampleTimes * (exp[i] / sumW) + 0.000001);
