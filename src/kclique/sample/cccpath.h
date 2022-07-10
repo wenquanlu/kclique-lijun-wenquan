@@ -123,6 +123,7 @@ struct cccpath {
             exp[i] = suD;
             suW += suD;
             //sumW += sumD; // sumW is the total number of k-paths in S
+            dpm.clear();
         }
         //printf("finished those loops\n");
         if (sortByColor != nullptr) delete [] sortByColor;
@@ -439,6 +440,7 @@ struct cccpath {
             ans += 1.0*tt/expectedSampleTime*exp[i];
             sampleTotalTimes += expectedSampleTime;
             if(c != nullptr) delete [] c;
+            dpm.clear();
         }
         
         if(sampleTotalTimes < sampleTimes) {
@@ -464,6 +466,7 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
                   t += sampleOneTime(id, u, uiDistribution);
                   sampleTotalTimes++;
                   if(c != nullptr) delete [] c;
+                  dpm.clear();
               }
              // printf("|small %.6f %u %u", 1.0 * t / sampleTotalTimes, t, sampleTotalTimes);
              // return 1.0 * t / sampleTotalTimes * sumW;
