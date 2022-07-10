@@ -438,6 +438,7 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
         // printf("| %.8f", expectedN / sumW);
         // if(c != nullptr) delete [] c;
         //return 1.0 * t / sampleTotalTimes * sumW;
+        printf("t: %u, sampleTotalTimes: %u, suW: %u\n", t, sampleTotalTimes, suW);
         return 1.0 * t / sampleTotalTimes * suW;
         //return ans;
     }
