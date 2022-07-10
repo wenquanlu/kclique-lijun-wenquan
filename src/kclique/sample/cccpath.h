@@ -378,7 +378,7 @@ struct cccpath {
 
             sortByColor = g->pEdge + g->pIdx2[u];
             // sortGraph(u);
-            printf("just %u\n", u);
+            //printf("just %u\n", u);
             computeDP(u);
 
             // first mistake made
