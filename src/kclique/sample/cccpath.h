@@ -316,6 +316,7 @@ struct cccpath {
             }
 
             for(int j = 0; j < i-1; j++) {
+                printf("i: %u, j: %u\n", i, j);
                 printf("clique[i]: %u, clique[j]: %u\n", clique[i], clique[j]);
                 if(!connect(clique[i], clique[j])) {
                     return 0;
