@@ -64,7 +64,7 @@ struct cccpath {
         
         for(v_size i = 0; i < sz; i++) { // for each node in s
             v_size u = nodes[i]; // guess nodes represent S
-            printf("u: %u\n", u);
+            //printf("u: %u\n", u);
             // sortByColor = g->pEdge + g->pIdx2[u];
 
             // std::sort(sortByColor,
@@ -111,7 +111,7 @@ struct cccpath {
             suW += suD;
             //sumW += sumD; // sumW is the total number of k-paths in S
         }
-        printf("finished those loops\n");
+        //printf("finished those loops\n");
         if (sortByColor != nullptr) delete [] sortByColor;
     }
 
@@ -361,7 +361,7 @@ struct cccpath {
         std::default_random_engine generator;
         std::uniform_real_distribution<double> uiDistribution(0, 1);
         double ans = 0.0;
-        printf("abc\n"); 
+        //printf("abc\n"); 
 
 
         for(v_size i = 0; i < sz; i++) {
@@ -389,8 +389,8 @@ struct cccpath {
                 }
             }
 
-            printf("si: %u\n", i);
-            fflush(stdout);
+            //printf("si: %u\n", i);
+            //fflush(stdout);
 
             v_size tt = 0;
             for(v_size j = 0; j < expectedSampleTime; j++) {
