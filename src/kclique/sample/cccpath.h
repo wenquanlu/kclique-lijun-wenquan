@@ -362,6 +362,10 @@ struct cccpath {
         double ans = 0.0;
         printf("abc\n"); 
 
+        for (int i = 0; i < sz; i++) {
+            printf("exp: %u\n", exp[i]);
+        }
+
         for(v_size i = 0; i < sz; i++) {
             v_size u = nodes[i];
             printf("j %u\n", u);
