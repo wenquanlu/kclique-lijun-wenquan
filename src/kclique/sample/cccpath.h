@@ -279,9 +279,11 @@ struct cccpath {
 
         for (v_size i = 0; i < k; i++) {
             x = d(e);
+            printf("x is %.4f\n", x);
             if (i == 0) {
                 for (v_size j = 0; j < deg; j++) {
                     sumT += c[j];
+                    printf("sumT: %.0f, dpm: %.0f\n", sumT, c[j]);
                     if (sumT + 1e-10 >= x * suD) {
                         clique[0] = sortByColor[ j ];
                         prId = j;
