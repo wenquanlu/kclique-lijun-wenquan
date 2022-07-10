@@ -107,16 +107,14 @@ struct cccpath {
             }
 
             ////////////////spot error use///////////////
-            /*double ccc = 0;
+            double ccc = 0;
             if (i == 0) {
-                for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
-                    ccc = 0;
-                    for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                        ccc += dpm[{i, pEdge[l], k}];
-                    }
-                    printf("ccc[%u]: %.0f\n", i, ccc);
+                ccc = 0;
+                for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
+                    ccc += dpm[{i, pEdge[l], k}];
                 }
-            }*/
+                printf("ccc[0]: %.0f\n", ccc);
+            }
             ///////////////////////////////////////////////
 
             //experiments[i] = sumD; // experiments[i] stores the total number of k-paths in the graph sum(dp[i][k])
@@ -426,6 +424,10 @@ struct cccpath {
                     c[i] += dpm[{i, pEdge[l], k}];
                 }
                 //printf("c[%u]: %.0f\n", i, c[i]);
+            }
+
+            if (i == 0) {
+                printf("c[0] check later: %.0f\n",c[0]);
             }
 
             //printf("si: %u\n", i);
