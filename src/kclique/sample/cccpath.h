@@ -34,12 +34,12 @@ struct cccpath {
     hopstotchHash * hashTable;
     v_size k;
     double * experiments;
-    u_int64_t * exp;
+    double * exp;
     double sumW;
     double ** dp;
     double * memoryPool = nullptr;
-    u_int64_t suW;
-    u_int64_t * c;
+    double suW;
+    double * c;
 
     v_size * pEdge = nullptr;
     v_size * pIdx = nullptr;
@@ -50,13 +50,13 @@ struct cccpath {
     v_size * clique = nullptr;
     std::default_random_engine e;
     e_size N = 5000000;
-    unordered_map<vector<v_size>, u_int64_t, container_hash<vector<v_size>>> dpm;
+    unordered_map<vector<v_size>, double, container_hash<vector<v_size>>> dpm;
 
     void init(v_size sz_, std::vector<v_size> & nodes, e_size N_=5000000) {
         sz = sz_;
         N = N_;
         experiments = new double[sz];
-        exp = new u_int64_t[sz];
+        exp = new double[sz];
 
         // auto cmp = [&](v_size a, v_size b) {
         //     return g->color[a] > g->color[b];
@@ -95,7 +95,7 @@ struct cccpath {
             computeDP(u);
 
             //double sumD = 0.0;
-            uint64_t suD = 0;
+            double suD = 0;
             /*for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
                 sumD += dp[i][k];
             }*/
@@ -261,11 +261,11 @@ struct cccpath {
         double sumD = experiments[id];
         double x = -1; // get a random double
 
-        uint64_t suD = exp[id];
+        double suD = exp[id];
         
         
         double sumTmp = 0.0;
-        uint64_t sumT = 0;
+        double sumT = 0;
         v_size deg = g->pIdx[u+1] - g->pIdx2[u]; // out degree of node u
 
         v_size last;
@@ -303,10 +303,10 @@ struct cccpath {
             } else {
                 sumT = 0;
                 suD = dpm[{secLast, last, k - i + 1}];
-                printf("suD: %u\n", suD);
+                printf("suD: %.0f\n", suD);
                 for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
                     sumT += dpm[{last, pEdge[j], k-i}];
-                    printf("sumT: %u, dpm: %u\n", sumT, dpm[{last, pEdge[j], k-i}]);
+                    printf("sumT: %.0f, dpm: %.0f\n", sumT, dpm[{last, pEdge[j], k-i}]);
                     if (sumT + 1e-10 >= x * suD) {
                         printf("pEdge[j]: %u\n", pEdge[j]);
                         clique[i] = sortByColor[ pEdge[j] ];
@@ -390,7 +390,7 @@ struct cccpath {
             // printf("exp s t: %u | exp: %u | sumW: %u\n", expectedSampleTime, exp[i], suW);
             if(expectedSampleTime == 0) continue;
 
-            c = new u_int64_t[g->pIdx[u+1] - g->pIdx2[u]];
+            c = new double[g->pIdx[u+1] - g->pIdx2[u]];
 
             sortByColor = g->pEdge + g->pIdx2[u];
             // sortGraph(u);
@@ -429,7 +429,7 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
                   v_size u = nodes[id];
                   sortByColor = g->pEdge + g->pIdx2[u];
                   // sortGraph(u);
-                  c = new u_int64_t[g->pIdx[u+1] - g->pIdx2[u]];
+                  c = new double[g->pIdx[u+1] - g->pIdx2[u]];
                   computeDP(u);
 
                   for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
@@ -454,7 +454,7 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
         // printf("| %.8f", expectedN / sumW);
         // if(c != nullptr) delete [] c;
         //return 1.0 * t / sampleTotalTimes * sumW;
-        printf("| t: %u, sampleTotalTimes: %u, suW: %u\n", t, sampleTotalTimes, suW);
+        printf("| t: %u, sampleTotalTimes: %u, suW: %.0f\n", t, sampleTotalTimes, suW);
         return 1.0 * t / sampleTotalTimes * suW;
         //return ans;
     }
