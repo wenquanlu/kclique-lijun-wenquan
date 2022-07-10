@@ -306,7 +306,7 @@ struct cccpath {
                 printf("suD: %u\n", suD);
                 for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
                     sumT += dpm[{last, pEdge[j], k-i}];
-                    printf("sumT: %u\n", sumT);
+                    printf("sumT: %u, dpm: %u\n", sumT, dpm[{last, pEdge[j], k-i}]);
                     if (sumT + 1e-10 >= x * suD) {
                         printf("pEdge[j]: %u\n", pEdge[j]);
                         clique[i] = sortByColor[ pEdge[j] ];
