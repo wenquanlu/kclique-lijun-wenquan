@@ -360,8 +360,10 @@ struct cccpath {
         std::default_random_engine generator;
         std::uniform_real_distribution<double> uiDistribution(0, 1);
         double ans = 0.0;
+        printf("abc\n"); 
 
         for(v_size i = 0; i < sz; i++) {
+            printf("j %u\n", u);
             v_size u = nodes[i];
 
             //e_size expectedSampleTime
