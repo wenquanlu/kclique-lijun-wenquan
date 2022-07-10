@@ -271,6 +271,10 @@ struct cccpath {
         v_size last;
         v_size secLast;
 
+        for (int i = 0; i < deg; i++) {
+            printf("%u: %u\n", i , sortByColor[i]);
+        }
+
         for (int i = 0; i < k; i++) {
             x = d(e);
             if (i == 0) {
