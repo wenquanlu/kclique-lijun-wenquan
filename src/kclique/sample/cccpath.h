@@ -279,6 +279,7 @@ struct cccpath {
                     if (sumT + 1e-10 >= x * suD) {
                         clique[0] = sortByColor[ j ];
                         prId = j;
+                        printf("break 0\n");
                         break;
                     }
                 }
@@ -290,6 +291,7 @@ struct cccpath {
                     if (sumT + 1e-10 >= x * suD) {
                         clique[1] = sortByColor[ pEdge[j] ];
                         prId = pEdge[j];
+                        printf("break 1\n");
                         break;
                     }
                 }
@@ -301,6 +303,7 @@ struct cccpath {
                     if (sumT + 1e-10 >= x * suD) {
                         clique[i] = sortByColor[ pEdge[j] ];
                         prId = pEdge[j];
+                        printf("break %u\n", i);
                         break;
                     }
                 }
