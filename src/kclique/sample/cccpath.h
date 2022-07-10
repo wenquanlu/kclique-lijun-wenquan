@@ -107,7 +107,7 @@ struct cccpath {
             }
 
             ////////////////spot error use///////////////
-            double ccc = 0;
+            /*double ccc = 0;
             if (i == 0) {
                 for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
                     ccc = 0;
@@ -116,7 +116,7 @@ struct cccpath {
                     }
                     printf("ccc[%u]: %.0f\n", i, ccc);
                 }
-            }
+            }*/
             ///////////////////////////////////////////////
 
             //experiments[i] = sumD; // experiments[i] stores the total number of k-paths in the graph sum(dp[i][k])
@@ -285,55 +285,55 @@ struct cccpath {
         v_size last;
         v_size secLast;
 
-        for (int i = 0; i < deg; i++) {
+        /*for (int i = 0; i < deg; i++) {
             printf("%u: %u\n", i , sortByColor[i]);
             printf("c[i]: %.0f\n", c[i]);
-        }
-        printf("deg: %u\n", deg);
+        }*/
+        //printf("deg: %u\n", deg);
 
         for (v_size i = 0; i < k; i++) {
             x = d(e);
-            printf("x is %.4f\n", x);
-            printf("suD: %.0f\n", suD);
+            //printf("x is %.4f\n", x);
+            //printf("suD: %.0f\n", suD);
             if (i == 0) {
                 for (v_size j = 0; j < deg; j++) {
                     sumT += c[j];
-                    printf("sumT: %.0f, dpm: %.0f\n", sumT, c[j]);
+                    //printf("sumT: %.0f, dpm: %.0f\n", sumT, c[j]);
                     if (sumT + 1e-10 >= x * suD) {
                         clique[0] = sortByColor[ j ];
                         prId = j;
-                        printf("break 0\n");
+                        //printf("break 0\n");
                         break;
                     }
                 }
             } else if (i == 1) {
                 sumT = 0;
                 suD = c[last];
-                printf("Iter1: secLast: %u, last: %u\n", secLast, last);
-                printf("suD: %.0f\n", suD);
+                //printf("Iter1: secLast: %u, last: %u\n", secLast, last);
+                //printf("suD: %.0f\n", suD);
                 for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
                     sumT += dpm[{last, pEdge[j], k-1}];
-                    printf("sumT: %.0f, dpm: %.0f\n", sumT, dpm[{last, pEdge[j], k-i}]);
+                    //printf("sumT: %.0f, dpm: %.0f\n", sumT, dpm[{last, pEdge[j], k-i}]);
                     if (sumT + 1e-10 >= x * suD) {
                         clique[1] = sortByColor[ pEdge[j] ];
                         prId = pEdge[j];
-                        printf("break 1\n");
+                        //printf("break 1\n");
                         break;
                     }
                 }
             } else {
                 sumT = 0;
-                printf("Iter>1: secLast: %u, last: %u\n", secLast, last);
+                //printf("Iter>1: secLast: %u, last: %u\n", secLast, last);
                 suD = dpm[{secLast, last, k - i + 1}];
-                printf("suD: %.0f\n", suD);
+                //printf("suD: %.0f\n", suD);
                 for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
                     sumT += dpm[{last, pEdge[j], k-i}];
-                    printf("sumT: %.0f, dpm: %.0f\n", sumT, dpm[{last, pEdge[j], k-i}]);
+                    //printf("sumT: %.0f, dpm: %.0f\n", sumT, dpm[{last, pEdge[j], k-i}]);
                     if (sumT + 1e-10 >= x * suD) {
-                        printf("pEdge[j]: %u\n", pEdge[j]);
+                        //printf("pEdge[j]: %u\n", pEdge[j]);
                         clique[i] = sortByColor[ pEdge[j] ];
                         prId = pEdge[j];
-                        printf("break %u\n", i);
+                        //printf("break %u\n", i);
                         break;
                     }
                 }
@@ -342,8 +342,8 @@ struct cccpath {
 
             if (i >= 1) {
                 for(v_size j = 0; j < i-1; j++) {
-                    printf("i: %u, j: %u\n", i, j);
-                    printf("clique[i]: %u, clique[j]: %u\n", clique[i], clique[j]);
+                    //printf("i: %u, j: %u\n", i, j);
+                    //printf("clique[i]: %u, clique[j]: %u\n", clique[i], clique[j]);
                     if(!connect(clique[i], clique[j])) {
                         return 0;
                     }
@@ -389,7 +389,7 @@ struct cccpath {
                 }
             }
         }*/
-        printf("has return!!!!!!!!!\n");
+        //printf("has return!!!!!!!!!\n");
         return 1;
     }
 
@@ -425,7 +425,7 @@ struct cccpath {
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
                     c[i] += dpm[{i, pEdge[l], k}];
                 }
-                printf("c[%u]: %.0f\n", i, c[i]);
+                //printf("c[%u]: %.0f\n", i, c[i]);
             }
 
             //printf("si: %u\n", i);
