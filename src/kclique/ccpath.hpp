@@ -455,6 +455,7 @@ printf("|%u| %.1f| %lu", k, alpha, N);
         printf("| %.2f%%", (exactCnt / totalCnt)*100);
         // double totalCntML = exactCnt + sampleCntMultiLayer;
         // printf("| %.2f%%", (exactCnt / totalCntML)*100);
+        printf("total count is: %.0f, actual: %.0f\n", totalCnt, exCnt);
         printf("| %.2f", (t1 - t)/CLOCKS_PER_SEC);
         
         
