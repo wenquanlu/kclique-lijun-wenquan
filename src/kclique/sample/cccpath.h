@@ -389,6 +389,7 @@ struct cccpath {
             t += tt;
             ans += 1.0*tt/expectedSampleTime*experiments[i];
             sampleTotalTimes += expectedSampleTime;
+            if(c != nullptr) delete [] c;
         }
         
         if(sampleTotalTimes < sampleTimes) {
@@ -400,9 +401,11 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
                   v_size u = nodes[id];
                   sortByColor = g->pEdge + g->pIdx2[u];
                   // sortGraph(u);
+                  c = new u_int64_t[g->pIdx[u+1] - g->pIdx2[u]];
                   computeDP(u);
                   t += sampleOneTime(id, u, uiDistribution);
                   sampleTotalTimes++;
+                  if(c != nullptr) delete [] c;
               }
              // printf("|small %.6f %u %u", 1.0 * t / sampleTotalTimes, t, sampleTotalTimes);
              // return 1.0 * t / sampleTotalTimes * sumW;
