@@ -105,19 +105,19 @@ struct cccpath {
 
             for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                    suD += dpm[{i, pEdge[l], k}];
+                    suD += dpm[{i, pEdge[l], k-1}];
                 }
             }
 
             ////////////////spot error use///////////////
-            double ccc = 0;
+            /*double ccc = 0;
             if (i == 0) {
                 ccc = 0;
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
                     ccc += dpm[{i, pEdge[l], k}];
                 }
                 printf("ccc[0]: %.0f\n", ccc);
-            }
+            }*/
             ///////////////////////////////////////////////
 
             //experiments[i] = sumD; // experiments[i] stores the total number of k-paths in the graph sum(dp[i][k])
@@ -257,7 +257,7 @@ struct cccpath {
             }
         }
 
-        for (v_size j = 3; j <= k; j++) {
+        for (v_size j = 3; j < k; j++) {
             for (v_size i = 0; i < outDegree; i++) {
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
                     v_size x = pEdge[l];
@@ -467,7 +467,7 @@ struct cccpath {
             for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
                 c[i] = 0;
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                    c[i] += dpm[{i, pEdge[l], k}];
+                    c[i] += dpm[{i, pEdge[l], k-1}]; // k - 1 here, very important
                 }
                 //printf("c[%u]: %.0f\n", i, c[i]);
             }
