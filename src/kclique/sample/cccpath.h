@@ -260,7 +260,7 @@ struct cccpath {
             for (v_size i = 0; i < outDegree; i++) {
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
                     v_size x = pEdge[l];
-                    unordered_set<int>::iterator iter;
+                    unordered_set<v_size>::iterator iter;
                     /*for (auto t: shared[{i,x}]) {
                         dpm[{i, x, j}] = dpm[{i, x, j}] + dpm[{x, t, j-1}];
                     }*/
