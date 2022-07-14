@@ -315,10 +315,10 @@ struct cccpath {
         v_size last;
         v_size secLast;
 
-        for (int i = 0; i < deg; i++) {
+        /*for (int i = 0; i < deg; i++) {
             printf("%u: %u\n", i , sortByColor[i]);
             printf("c[i]: %.0f\n", c[i]);
-        }
+        }*/
         //printf("deg: %u\n", deg);
 
         for (v_size i = 0; i < k; i++) {
@@ -332,22 +332,22 @@ struct cccpath {
                     if (sumT + 1e-10 >= x * suD) {
                         clique[0] = sortByColor[ j ];
                         prId = j;
-                        printf("break 0\n");
+                        //printf("break 0\n");
                         break;
                     }
                 }
             } else if (i == 1) {
                 sumT = 0;
                 suD = c[last];
-                printf("Iter1: secLast: %u, last: %u\n", secLast, last);
-                printf("suD: %.0f\n", suD);
+                //printf("Iter1: secLast: %u, last: %u\n", secLast, last);
+                //printf("suD: %.0f\n", suD);
                 for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
                     sumT += dpm[{last, pEdge[j], k-1}];
-                    printf("sumT: %.0f, dpm: %.0f\n", sumT, dpm[{last, pEdge[j], k-i}]);
+                    //printf("sumT: %.0f, dpm: %.0f\n", sumT, dpm[{last, pEdge[j], k-i}]);
                     if (sumT + 1e-10 >= x * suD) {
                         clique[1] = sortByColor[ pEdge[j] ];
                         prId = pEdge[j];
-                        printf("break 1\n");
+                        //printf("break 1\n");
                         break;
                     }
                 }
@@ -360,10 +360,10 @@ struct cccpath {
                 for (iter = shared[{secLast, last}].begin(); iter != shared[{secLast, last}].end(); iter++) {
                         sumT += dpm[{last, *iter, k-i}];
                         if (sumT + 1e-10 >= x * suD) {
-                            printf("debug *iter: %u\n", *iter);
+                            //printf("debug *iter: %u\n", *iter);
                             clique[i] = sortByColor[ *iter ];
                             prId = *iter;
-                            printf("break %u\n", i);
+                            //printf("break %u\n", i);
                             break;
                         }
                 }
@@ -451,9 +451,9 @@ struct cccpath {
                 //= std::round(sampleTimes * (experiments[i] / sumW) + 0.000001);
             e_size expectedSampleTime = std::round(sampleTimes * (((double) exp[i]) / suW) + 0.000001);
             // expected SampleTime is the expected sample time for sampling around node u
-            printf("exp s t: %u | exp: %.0f | sumW: %.0f\n", expectedSampleTime, exp[i], suW);
+            //printf("exp s t: %u | exp: %.0f | sumW: %.0f\n", expectedSampleTime, exp[i], suW);
             //printf("exp[i]: %u\n", exp[i]);
-            printf("ext: %u\n", expectedSampleTime);
+            //printf("ext: %u\n", expectedSampleTime);
             if(expectedSampleTime == 0) continue;
 
             c = new double[g->pIdx[u+1] - g->pIdx2[u]];
@@ -472,9 +472,9 @@ struct cccpath {
                 //printf("c[%u]: %.0f\n", i, c[i]);
             }
 
-            if (i == 0) {
+            /*(if (i == 0) {
                 printf("c[0] check later: %.0f\n",c[0]);
-            }
+            }*/
 
             //printf("si: %u\n", i);
             //fflush(stdout);
