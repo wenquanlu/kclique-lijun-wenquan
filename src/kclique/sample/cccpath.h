@@ -121,9 +121,10 @@ struct cccpath {
             ///////////////////////////////////////////////
 
             //experiments[i] = sumD; // experiments[i] stores the total number of k-paths in the graph sum(dp[i][k])
-            printf("suD: %u\n", suD);
+
             exp[i] = suD;
             suW += suD;
+            printf("suW: %u\n", suW);
             //sumW += sumD; // sumW is the total number of k-paths in S
             dpm.clear();
             shared.clear();
