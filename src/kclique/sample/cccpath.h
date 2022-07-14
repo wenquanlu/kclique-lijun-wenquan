@@ -66,7 +66,6 @@ struct cccpath {
         // };
         
         for(v_size i = 0; i < sz; i++) { // for each node in s
-            printf("suW start: %.0f\n", suW);
             v_size u = nodes[i]; // guess nodes represent S
             //printf("u: %u\n", u);
             // sortByColor = g->pEdge + g->pIdx2[u];
@@ -124,13 +123,10 @@ struct cccpath {
             //experiments[i] = sumD; // experiments[i] stores the total number of k-paths in the graph sum(dp[i][k])
 
             exp[i] = suD;
-            printf("suW: %.0f\n", suW);
             suW += suD;
-            printf("suW: %.0f\n", suW);
             //sumW += sumD; // sumW is the total number of k-paths in S
             dpm.clear();
             shared.clear();
-            printf("suW later: %.0f\n", suW);
         }
         //printf("finished those loops\n");
         if (sortByColor != nullptr) delete [] sortByColor;
@@ -138,7 +134,6 @@ struct cccpath {
 
     // careful, k here is k - 1
     void initForSingleNode(v_size k_, Graph * g_, hopstotchHash * hashTable_) {
-        printf("called only once!!!!!!!!!!!!!!!!!!!\n");
         k = k_;
         g = g_;
         hashTable = hashTable_;
@@ -456,7 +451,7 @@ struct cccpath {
                 //= std::round(sampleTimes * (experiments[i] / sumW) + 0.000001);
             e_size expectedSampleTime = std::round(sampleTimes * (((double) exp[i]) / suW) + 0.000001);
             // expected SampleTime is the expected sample time for sampling around node u
-            printf("exp s t: %u | exp: %u | sumW: %u\n", expectedSampleTime, exp[i], suW);
+            printf("exp s t: %u | exp: %.0f | sumW: %.0f\n", expectedSampleTime, exp[i], suW);
             //printf("exp[i]: %u\n", exp[i]);
             printf("ext: %u\n", expectedSampleTime);
             if(expectedSampleTime == 0) continue;
