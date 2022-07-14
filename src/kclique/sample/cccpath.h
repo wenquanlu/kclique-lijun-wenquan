@@ -359,7 +359,7 @@ struct cccpath {
                 for (iter = shared[{secLast, last}].begin(); iter != shared[{secLast, last}].end(); iter++) {
                         sumT += dpm[{last, *iter, k-i}];
                         if (sumT + 1e-10 >= x * suD) {
-                            //printf("pEdge[j]: %u\n", pEdge[j]);
+                            printf("debug *iter: %u\n", *iter);
                             clique[i] = sortByColor[ *iter ];
                             prId = *iter;
                             //printf("break %u\n", i);
