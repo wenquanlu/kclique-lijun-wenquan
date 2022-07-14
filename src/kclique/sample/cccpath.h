@@ -136,6 +136,7 @@ struct cccpath {
 
     // careful, k here is k - 1
     void initForSingleNode(v_size k_, Graph * g_, hopstotchHash * hashTable_) {
+        printf("called only once!!!!!!!!!!!!!!!!!!!\n");
         k = k_;
         g = g_;
         hashTable = hashTable_;
