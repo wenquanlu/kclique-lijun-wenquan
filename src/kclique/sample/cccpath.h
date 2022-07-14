@@ -450,8 +450,8 @@ struct cccpath {
                 //= std::round(sampleTimes * (experiments[i] / sumW) + 0.000001);
             e_size expectedSampleTime = std::round(sampleTimes * (((double) exp[i]) / suW) + 0.000001);
             // expected SampleTime is the expected sample time for sampling around node u
-            // printf("exp s t: %u | exp: %u | sumW: %u\n", expectedSampleTime, exp[i], suW);
-            printf("exp[i]: %u\n", exp[i]);
+            printf("exp s t: %u | exp: %u | sumW: %u\n", expectedSampleTime, exp[i], suW);
+            //printf("exp[i]: %u\n", exp[i]);
             printf("ext: %u\n", expectedSampleTime);
             if(expectedSampleTime == 0) continue;
 
