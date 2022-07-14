@@ -64,9 +64,10 @@ struct cccpath {
         // auto cmp = [&](v_size a, v_size b) {
         //     return g->color[a] > g->color[b];
         // };
+        double sum = 0;
         
         for(v_size i = 0; i < sz; i++) { // for each node in s
-            printf("suW start: %u\n", suW);
+            printf("suW start: %u\n", sum);
             v_size u = nodes[i]; // guess nodes represent S
             //printf("u: %u\n", u);
             // sortByColor = g->pEdge + g->pIdx2[u];
@@ -124,16 +125,17 @@ struct cccpath {
             //experiments[i] = sumD; // experiments[i] stores the total number of k-paths in the graph sum(dp[i][k])
 
             exp[i] = suD;
-            printf("suW: %u\n", suW);
-            suW += suD;
-            printf("suW: %u\n", suW);
+            printf("suW: %u\n", sum);
+            sum += suD;
+            printf("suW: %u\n", sum);
             //sumW += sumD; // sumW is the total number of k-paths in S
             dpm.clear();
             shared.clear();
-            printf("suW later: %u\n", suW);
+            printf("suW later: %u\n", sum);
         }
         //printf("finished those loops\n");
         if (sortByColor != nullptr) delete [] sortByColor;
+        suW = sum;
     }
 
     // careful, k here is k - 1
