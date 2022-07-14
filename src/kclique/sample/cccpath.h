@@ -124,11 +124,12 @@ struct cccpath {
 
             exp[i] = suD;
             printf("suW: %u\n", suW);
-            suW = suW + suD;
+            suW += suD;
             printf("suW: %u\n", suW);
             //sumW += sumD; // sumW is the total number of k-paths in S
             dpm.clear();
             shared.clear();
+            printf("suW later: %u\n", suW);
         }
         //printf("finished those loops\n");
         if (sortByColor != nullptr) delete [] sortByColor;
