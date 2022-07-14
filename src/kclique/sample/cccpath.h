@@ -14,10 +14,12 @@
 #include <random>
 #include <unordered_map>
 #include <boost/functional/hash.hpp>
+#include <unordered_set>
 
 using Pair = std::pair<v_size, v_size>;
 using std::vector;
 using std::unordered_map;
+using std::unordered_set;
 
 // constexpr v_size batchSize = 50;
 
@@ -51,6 +53,7 @@ struct cccpath {
     std::default_random_engine e;
     e_size N = 5000000;
     unordered_map<vector<v_size>, double, container_hash<vector<v_size>>> dpm;
+    unordered_map<vector<v_size>, unordered_set<v_size>, container_hash<vector<v_size>>> shared;
 
     void init(v_size sz_, std::vector<v_size> & nodes, e_size N_=5000000) {
         sz = sz_;
@@ -122,6 +125,7 @@ struct cccpath {
             suW += suD;
             //sumW += sumD; // sumW is the total number of k-paths in S
             dpm.clear();
+            shared.clear();
         }
         //printf("finished those loops\n");
         if (sortByColor != nullptr) delete [] sortByColor;
@@ -233,19 +237,46 @@ struct cccpath {
                 }
         }
 
-        for (v_size j = 2; j <= k; j++) {
-            for (v_size i = 0; i < outDegree; i++) {
-                for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                    v_size x = pEdge[l];
-                    for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
-                        v_size t = pEdge[p];
-                        if (dpm[{i, t, 1}] == 1) {
-                            dpm[{i, x, j}] = dpm[{i, x, j}] + dpm[{x, t, j-1}];
+        for (v_size i = 0; i < outDegree; i++) {
+            for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
+                v_size x = pEdge[l];
+                for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
+                    v_size t = pEdge[p];
+                    if (dpm[{i, t, 1}] == 1) {
+                        dpm[{i, x, 2}] = dpm[{i, x, 2}] + dpm[{x, t, 1}];
+                        if (shared.find({i,x}) == shared.end()) {
+                            // if key does not exsit
+                            shared.emplace({i,x}, unordered_set<v_size>{t});
+                        } else {
+                            // if key exists
+                            shared[{i,x}].insert(t);
                         }
                     }
                 }
             }
         }
+
+        for (v_size j = 3; j <= k; j++) {
+            for (v_size i = 0; i < outDegree; i++) {
+                for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
+                    v_size x = pEdge[l];
+                    unordered_set<int>::iterator iter;
+                    /*for (auto t: shared[{i,x}]) {
+                        dpm[{i, x, j}] = dpm[{i, x, j}] + dpm[{x, t, j-1}];
+                    }*/
+                    for (iter = shared[{i,x}].begin(); iter != shared[{i,x}].end(); iter++) {
+                        dpm[{i, x, j}] = dpm[{i, x, j}] + dpm[{x, *iter, j-1}];
+                    }
+                    /*for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
+                        v_size t = pEdge[p];
+                        if (dpm[{i, t, 1}] == 1) {
+                            dpm[{i, x, j}] = dpm[{i, x, j}] + dpm[{x, t, j-1}];
+                        }
+                    }*/
+                }
+            }
+        }
+
 
 
 
@@ -444,6 +475,7 @@ struct cccpath {
             sampleTotalTimes += expectedSampleTime;
             if(c != nullptr) delete [] c;
             dpm.clear();
+            shared.clear();
         }
         
         if(sampleTotalTimes < sampleTimes) {
@@ -470,6 +502,7 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
                   sampleTotalTimes++;
                   if(c != nullptr) delete [] c;
                   dpm.clear();
+                  shared.clear();
               }
              // printf("|small %.6f %u %u", 1.0 * t / sampleTotalTimes, t, sampleTotalTimes);
              // return 1.0 * t / sampleTotalTimes * sumW;
