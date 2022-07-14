@@ -355,6 +355,17 @@ struct cccpath {
                 //printf("Iter>1: secLast: %u, last: %u\n", secLast, last);
                 suD = dpm[{secLast, last, k - i + 1}];
                 //printf("suD: %.0f\n", suD);
+                for (iter = shared[{secLast, last}].begin(); iter != shared[{secLast, last}].end(); iter++) {
+                        sumT += dpm[{last, *iter, k-i}];
+                        if (sumT + 1e-10 >= x * suD) {
+                            //printf("pEdge[j]: %u\n", pEdge[j]);
+                            clique[i] = sortByColor[ *iter ];
+                            prId = *iter;
+                            //printf("break %u\n", i);
+                            break;
+                        }
+                }
+                /*
                 for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
                     sumT += dpm[{last, pEdge[j], k-i}];
                     //printf("sumT: %.0f, dpm: %.0f\n", sumT, dpm[{last, pEdge[j], k-i}]);
@@ -365,7 +376,7 @@ struct cccpath {
                         //printf("break %u\n", i);
                         break;
                     }
-                }
+                }*/
 
             }
 
