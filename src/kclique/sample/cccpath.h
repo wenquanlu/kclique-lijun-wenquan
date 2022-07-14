@@ -246,7 +246,7 @@ struct cccpath {
                         dpm[{i, x, 2}] = dpm[{i, x, 2}] + dpm[{x, t, 1}];
                         if (shared.find({i,x}) == shared.end()) {
                             // if key does not exsit
-                            shared.emplace({i,x}, unordered_set<v_size>{t});
+                            shared[{i,x}] = unordered_set<v_size>{t};
                         } else {
                             // if key exists
                             shared[{i,x}].insert(t);
