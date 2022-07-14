@@ -510,8 +510,9 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
                   for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
                       c[i] = 0;
                       for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                          c[i] += dpm[{i, pEdge[l], k}];
+                          c[i] += dpm[{i, pEdge[l], k-1}]; // k - 1 here, very important
                       }
+                        //printf("c[%u]: %.0f\n", i, c[i]);
                   }
 
                   t += sampleOneTime(id, u, uiDistribution);
