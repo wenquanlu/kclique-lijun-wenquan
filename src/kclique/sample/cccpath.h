@@ -40,7 +40,7 @@ struct cccpath {
     double sumW;
     double ** dp;
     double * memoryPool = nullptr;
-    double suW = 0;
+    double suW;
     double * c;
 
     v_size * pEdge = nullptr;
@@ -123,6 +123,7 @@ struct cccpath {
             //experiments[i] = sumD; // experiments[i] stores the total number of k-paths in the graph sum(dp[i][k])
 
             exp[i] = suD;
+            printf("suW: %u\n", suW);
             suW += suD;
             printf("suW: %u\n", suW);
             //sumW += sumD; // sumW is the total number of k-paths in S
@@ -139,7 +140,7 @@ struct cccpath {
         g = g_;
         hashTable = hashTable_;
         sumW = 0.0;
-        //suW = 0;
+        suW = 0;
         clique = new v_size[k];
 /*
         dp = new double*[g->degeneracy];
