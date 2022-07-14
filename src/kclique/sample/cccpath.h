@@ -66,6 +66,7 @@ struct cccpath {
         // };
         
         for(v_size i = 0; i < sz; i++) { // for each node in s
+            printf("suW start: %u\n", suW);
             v_size u = nodes[i]; // guess nodes represent S
             //printf("u: %u\n", u);
             // sortByColor = g->pEdge + g->pIdx2[u];
