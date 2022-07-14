@@ -315,10 +315,10 @@ struct cccpath {
         v_size last;
         v_size secLast;
 
-        /*for (int i = 0; i < deg; i++) {
+        for (int i = 0; i < deg; i++) {
             printf("%u: %u\n", i , sortByColor[i]);
             printf("c[i]: %.0f\n", c[i]);
-        }*/
+        }
         //printf("deg: %u\n", deg);
 
         for (v_size i = 0; i < k; i++) {
