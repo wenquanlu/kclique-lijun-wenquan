@@ -339,11 +339,11 @@ struct cccpath {
             } else if (i == 1) {
                 sumT = 0;
                 suD = c[last];
-                //printf("Iter1: secLast: %u, last: %u\n", secLast, last);
-                //printf("suD: %.0f\n", suD);
+                printf("Iter1: secLast: %u, last: %u\n", secLast, last);
+                printf("suD: %.0f\n", suD);
                 for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
                     sumT += dpm[{last, pEdge[j], k-1}];
-                    //printf("sumT: %.0f, dpm: %.0f\n", sumT, dpm[{last, pEdge[j], k-i}]);
+                    printf("sumT: %.0f, dpm: %.0f\n", sumT, dpm[{last, pEdge[j], k-i}]);
                     if (sumT + 1e-10 >= x * suD) {
                         clique[1] = sortByColor[ pEdge[j] ];
                         prId = pEdge[j];
