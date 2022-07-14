@@ -355,6 +355,7 @@ struct cccpath {
                 //printf("Iter>1: secLast: %u, last: %u\n", secLast, last);
                 suD = dpm[{secLast, last, k - i + 1}];
                 //printf("suD: %.0f\n", suD);
+                unordered_set<v_size>::iterator iter;
                 for (iter = shared[{secLast, last}].begin(); iter != shared[{secLast, last}].end(); iter++) {
                         sumT += dpm[{last, *iter, k-i}];
                         if (sumT + 1e-10 >= x * suD) {
