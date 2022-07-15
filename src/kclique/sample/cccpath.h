@@ -13,7 +13,6 @@
 #include <algorithm>
 #include <random>
 #include <unordered_map>
-#include <boost/functional/hash.hpp>
 #include <unordered_set>
 
 using Pair = std::pair<v_size, v_size>;
@@ -23,10 +22,13 @@ using std::unordered_set;
 
 // constexpr v_size batchSize = 50;
 
-template <typename Container> // we can make this generic for any container [1]
-struct container_hash {
-    std::size_t operator()(Container const& c) const {
-        return boost::hash_range(c.begin(), c.end());
+struct VectorHasher {
+    std::size_t operator()(std::vector<v_size> const& vec) const {
+        std::size_t seed = vec.size();
+        for(auto& i : vec) {
+            seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        }
+        return seed;
     }
 };
 
@@ -52,8 +54,8 @@ struct cccpath {
     v_size * clique = nullptr;
     std::default_random_engine e;
     e_size N = 5000000;
-    unordered_map<vector<v_size>, double, container_hash<vector<v_size>>> dpm;
-    unordered_map<vector<v_size>, unordered_set<v_size>, container_hash<vector<v_size>>> shared;
+    unordered_map<vector<v_size>, double, VectorHasher> dpm;
+    unordered_map<vector<v_size>, unordered_set<v_size>, VectorHasher> shared;
 
     void init(v_size sz_, std::vector<v_size> & nodes, e_size N_=5000000) {
         sz = sz_;
