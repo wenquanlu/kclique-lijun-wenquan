@@ -1,4 +1,8 @@
 # kclique counting
+A modification of k-clique counting algorithm in this Github https://github.com/LightWant/dpcolor
+
+Major change is in src/kclique/sample/cccpath.h file
+Also added comments to make the code more readable
 
 ## Build
 
