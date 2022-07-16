@@ -125,7 +125,6 @@ struct cccpath {
             exp[i] = suD;
             suW += suD;
             //sumW += sumD; // sumW is the total number of k-paths in S
-            shared.clear();
         }
         //printf("finished those loops\n");
         if (sortByColor != nullptr) delete [] sortByColor;
@@ -191,6 +190,7 @@ struct cccpath {
         if(memoryPool != nullptr) delete [] memoryPool;
         if(dp != nullptr) delete [] dp;
         dpm.clear();
+        shared.clear();
         if(pEdge != nullptr) delete [] pEdge;
         if(pIdx != nullptr) delete [] pIdx;
         // if(sortByColor != nullptr) delete [] sortByColor;
@@ -242,17 +242,12 @@ struct cccpath {
             for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
                 v_size x = pEdge[l];
                 dpm[{i, x, 2}] = 0.0;
+                shared[{i,x}] = unordered_set<v_size>{};
                 for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
                     v_size t = pEdge[p];
                     if (dpm[{i, t, 1}] == 1) {
                         dpm[{i, x, 2}] = dpm[{i, x, 2}] + dpm[{x, t, 1}];
-                        if (shared.find({i,x}) == shared.end()) {
-                            // if key does not exsit
-                            shared[{i,x}] = unordered_set<v_size>{t};
-                        } else {
-                            // if key exists
-                            shared[{i,x}].insert(t);
-                        }
+                        shared[{i,x}].insert(t);
                     }
                 }
             }
@@ -492,7 +487,6 @@ struct cccpath {
             ans += 1.0*tt/expectedSampleTime*exp[i];
             sampleTotalTimes += expectedSampleTime;
             if(c != nullptr) delete [] c;
-            shared.clear();
         }
         
         if(sampleTotalTimes < sampleTimes) {
@@ -519,7 +513,6 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
                   t += sampleOneTime(id, u, uiDistribution);
                   sampleTotalTimes++;
                   if(c != nullptr) delete [] c;
-                  shared.clear();
               }
              // printf("|small %.6f %u %u", 1.0 * t / sampleTotalTimes, t, sampleTotalTimes);
              // return 1.0 * t / sampleTotalTimes * sumW;
