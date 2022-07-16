@@ -202,6 +202,9 @@ struct cccpath {
         if(memoryPool != nullptr) delete [] memoryPool;
         if(dp != nullptr) delete [] dp;
         if (memPool != nullptr) delete [] memPool;
+        for (v_size i = 0; i < g -> degeneracy; i++) {
+            delete [] dpm[i];
+        }
         if(dpm != nullptr) delete [] dpm;
         shared.clear();
         if(pEdge != nullptr) delete [] pEdge;
