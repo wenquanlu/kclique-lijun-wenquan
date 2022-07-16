@@ -147,7 +147,7 @@ struct cccpath {
             //dpm[i] = memPool + p;
             for (v_size j = 0; j < g-> degeneracy; j++) {
                 dpm[i][j] = memPool + p;
-                p += k + 1
+                p += k + 1;
             }
         }
 /*
