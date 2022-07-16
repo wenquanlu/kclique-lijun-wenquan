@@ -42,6 +42,8 @@ struct cccpath {
     double * memoryPool = nullptr;
     double suW;
     double * c;
+    double *** dpm;
+    double * memPool = nullptr;
 
     v_size * pEdge = nullptr;
     v_size * pIdx = nullptr;
@@ -52,7 +54,6 @@ struct cccpath {
     v_size * clique = nullptr;
     std::default_random_engine e;
     e_size N = 5000000;
-    unordered_map<vector<v_size>, double, container_hash<vector<v_size>>> dpm;
     unordered_map<vector<v_size>, unordered_set<v_size>, container_hash<vector<v_size>>> shared;
 
     void init(v_size sz_, std::vector<v_size> & nodes, e_size N_=5000000) {
@@ -138,6 +139,17 @@ struct cccpath {
         sumW = 0.0;
         suW = 0;
         clique = new v_size[k];
+
+        dpm = new double**[g->degeneracy];
+        memPool = new double[(g->degeneracy) * (g->degeneracy) * (k+1)]();
+        v_size p = 0;
+        for (v_size i = 0; i < g -> degeneracy; i++) {
+            dpm[i] = memPool + p;
+            for (v_size j = 0; j < g-> degeneracy; j++) {
+                dpm[i][j] = memPool + p;
+                p += k + 1
+            }
+        }
 /*
         dp = new double*[g->degeneracy];
         memoryPool = new double[g->degeneracy * (k+1)]();
@@ -189,7 +201,8 @@ struct cccpath {
         if (exp != nullptr) delete [] exp;
         if(memoryPool != nullptr) delete [] memoryPool;
         if(dp != nullptr) delete [] dp;
-        dpm.clear();
+        if (memPool != nullptr) delete [] memPool;
+        if(dpm != nullptr) delete [] dpm;
         shared.clear();
         if(pEdge != nullptr) delete [] pEdge;
         if(pIdx != nullptr) delete [] pIdx;
@@ -234,19 +247,19 @@ struct cccpath {
 
         for (v_size i = 0; i < outDegree; i++) {
             for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                    dpm[{i, pEdge[l], 1}] = 1;
+                    dpm[i][pEdge[l]][1] = 1;
                 }
         }
 
         for (v_size i = 0; i < outDegree; i++) {
             for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
                 v_size x = pEdge[l];
-                dpm[{i, x, 2}] = 0.0;
+                dpm[i][x][2] = 0.0;
                 shared[{i,x}] = unordered_set<v_size>{};
                 for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
                     v_size t = pEdge[p];
-                    if (dpm[{i, t, 1}] == 1) {
-                        dpm[{i, x, 2}] = dpm[{i, x, 2}] + dpm[{x, t, 1}];
+                    if (dpm[i][t][1] == 1) {
+                        dpm[i][x][2] = dpm[i][x][2] + dpm[x][t][1];
                         shared[{i,x}].insert(t);
                     }
                 }
@@ -257,13 +270,13 @@ struct cccpath {
             for (v_size i = 0; i < outDegree; i++) {
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
                     v_size x = pEdge[l];
-                    dpm[{i, x, j}] = 0.0;
+                    dpm[i][x][j] = 0.0;
                     unordered_set<v_size>::iterator iter;
                     /*for (auto t: shared[{i,x}]) {
                         dpm[{i, x, j}] = dpm[{i, x, j}] + dpm[{x, t, j-1}];
                     }*/
                     for (iter = shared[{i,x}].begin(); iter != shared[{i,x}].end(); iter++) {
-                        dpm[{i, x, j}] = dpm[{i, x, j}] + dpm[{x, *iter, j-1}];
+                        dpm[i][x][j] = dpm[i][x][j] + dpm[x][*iter][j-1];
                     }
                     /*for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
                         v_size t = pEdge[p];
@@ -341,7 +354,7 @@ struct cccpath {
                 //printf("Iter1: secLast: %u, last: %u\n", secLast, last);
                 //printf("suD: %.0f\n", suD);
                 for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
-                    sumT += dpm[{last, pEdge[j], k-1}];
+                    sumT += dpm[last][pEdge[j]][k-1];
                     //printf("sumT: %.0f, dpm: %.0f\n", sumT, dpm[{last, pEdge[j], k-i}]);
                     if (sumT + 1e-10 >= x * suD) {
                         clique[1] = sortByColor[ pEdge[j] ];
@@ -353,11 +366,11 @@ struct cccpath {
             } else {
                 sumT = 0;
                 //printf("Iter>1: secLast: %u, last: %u\n", secLast, last);
-                suD = dpm[{secLast, last, k - i + 1}];
+                suD = dpm[secLast][last][k - i + 1];
                 //printf("suD: %.0f\n", suD);
                 unordered_set<v_size>::iterator iter;
                 for (iter = shared[{secLast, last}].begin(); iter != shared[{secLast, last}].end(); iter++) {
-                        sumT += dpm[{last, *iter, k-i}];
+                        sumT += dpm[last][*iter][k-i];
                         if (sumT + 1e-10 >= x * suD) {
                             //printf("debug *iter: %u\n", *iter);
                             clique[i] = sortByColor[ *iter ];
@@ -466,7 +479,7 @@ struct cccpath {
             for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
                 c[i] = 0;
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                    c[i] += dpm[{i, pEdge[l], k-1}]; // k - 1 here, very important
+                    c[i] += dpm[i][pEdge[l]][k-1]; // k - 1 here, very important
                 }
                 //printf("c[%u]: %.0f\n", i, c[i]);
             }
@@ -505,7 +518,7 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
                   for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
                       c[i] = 0;
                       for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                          c[i] += dpm[{i, pEdge[l], k-1}]; // k - 1 here, very important
+                          c[i] += dpm[i][pEdge[l]][k-1]; // k - 1 here, very important
                       }
                         //printf("c[%u]: %.0f\n", i, c[i]);
                   }
