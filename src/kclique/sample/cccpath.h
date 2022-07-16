@@ -125,7 +125,6 @@ struct cccpath {
             exp[i] = suD;
             suW += suD;
             //sumW += sumD; // sumW is the total number of k-paths in S
-            dpm.clear();
             shared.clear();
         }
         //printf("finished those loops\n");
@@ -191,6 +190,7 @@ struct cccpath {
         if (exp != nullptr) delete [] exp;
         if(memoryPool != nullptr) delete [] memoryPool;
         if(dp != nullptr) delete [] dp;
+        if (dpm != nullptr) delete [] dpm;
         if(pEdge != nullptr) delete [] pEdge;
         if(pIdx != nullptr) delete [] pIdx;
         // if(sortByColor != nullptr) delete [] sortByColor;
@@ -241,6 +241,7 @@ struct cccpath {
         for (v_size i = 0; i < outDegree; i++) {
             for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
                 v_size x = pEdge[l];
+                dpm[{i, x, 2}] = 0.0;
                 for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
                     v_size t = pEdge[p];
                     if (dpm[{i, t, 1}] == 1) {
@@ -261,6 +262,7 @@ struct cccpath {
             for (v_size i = 0; i < outDegree; i++) {
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
                     v_size x = pEdge[l];
+                    dpm[{i, x, j}] = 0.0;
                     unordered_set<v_size>::iterator iter;
                     /*for (auto t: shared[{i,x}]) {
                         dpm[{i, x, j}] = dpm[{i, x, j}] + dpm[{x, t, j-1}];
@@ -490,7 +492,6 @@ struct cccpath {
             ans += 1.0*tt/expectedSampleTime*exp[i];
             sampleTotalTimes += expectedSampleTime;
             if(c != nullptr) delete [] c;
-            dpm.clear();
             shared.clear();
         }
         
@@ -518,7 +519,6 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
                   t += sampleOneTime(id, u, uiDistribution);
                   sampleTotalTimes++;
                   if(c != nullptr) delete [] c;
-                  dpm.clear();
                   shared.clear();
               }
              // printf("|small %.6f %u %u", 1.0 * t / sampleTotalTimes, t, sampleTotalTimes);
