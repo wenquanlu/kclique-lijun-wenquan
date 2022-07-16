@@ -190,7 +190,7 @@ struct cccpath {
         if (exp != nullptr) delete [] exp;
         if(memoryPool != nullptr) delete [] memoryPool;
         if(dp != nullptr) delete [] dp;
-        if (dpm != nullptr) delete [] dpm;
+        dpm.clear();
         if(pEdge != nullptr) delete [] pEdge;
         if(pIdx != nullptr) delete [] pIdx;
         // if(sortByColor != nullptr) delete [] sortByColor;
