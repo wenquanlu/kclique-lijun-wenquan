@@ -106,7 +106,7 @@ struct cccpath {
 
             for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                    suD += dpm[{i, pEdge[l], k-1}];
+                    suD += dpm[i][pEdge[l]][k-1];
                 }
             }
 
