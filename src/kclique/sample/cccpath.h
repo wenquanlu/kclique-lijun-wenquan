@@ -54,7 +54,6 @@ struct cccpath {
     v_size * clique = nullptr;
     std::default_random_engine e;
     e_size N = 5000000;
-    unordered_map<vector<v_size>, unordered_set<v_size>, container_hash<vector<v_size>>> shared;
 
     void init(v_size sz_, std::vector<v_size> & nodes, e_size N_=5000000) {
         sz = sz_;
@@ -206,7 +205,6 @@ struct cccpath {
             delete [] dpm[i];
         }
         if(dpm != nullptr) delete [] dpm;
-        shared.clear();
         if(pEdge != nullptr) delete [] pEdge;
         if(pIdx != nullptr) delete [] pIdx;
         // if(sortByColor != nullptr) delete [] sortByColor;
@@ -254,33 +252,18 @@ struct cccpath {
                 }
         }
 
-        for (v_size i = 0; i < outDegree; i++) {
-            for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                v_size x = pEdge[l];
-                dpm[i][x][2] = 0.0;
-                shared[{i,x}] = unordered_set<v_size>{};
-                for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
-                    v_size t = pEdge[p];
-                    if (dpm[i][t][1] == 1) {
-                        dpm[i][x][2] = dpm[i][x][2] + dpm[x][t][1];
-                        shared[{i,x}].insert(t);
-                    }
-                }
-            }
-        }
 
-        for (v_size j = 3; j < k; j++) {
+        for (v_size j = 2; j < k; j++) {
             for (v_size i = 0; i < outDegree; i++) {
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
                     v_size x = pEdge[l];
                     dpm[i][x][j] = 0.0;
-                    unordered_set<v_size>::iterator iter;
-                    /*for (auto t: shared[{i,x}]) {
-                        dpm[{i, x, j}] = dpm[{i, x, j}] + dpm[{x, t, j-1}];
-                    }*/
-                    for (iter = shared[{i,x}].begin(); iter != shared[{i,x}].end(); iter++) {
-                        dpm[i][x][j] = dpm[i][x][j] + dpm[x][*iter][j-1];
-                    }
+                    for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
+                        v_size t = pEdge[p];
+                        if (dpm[i][t][1] == 1) {
+                            dpm[i][x][j] = dpm[i][x][j] + dpm[x][t][j-1];
+                        }
+                    }    
                     /*for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
                         v_size t = pEdge[p];
                         if (dpm[{i, t, 1}] == 1) {
@@ -371,16 +354,16 @@ struct cccpath {
                 //printf("Iter>1: secLast: %u, last: %u\n", secLast, last);
                 suD = dpm[secLast][last][k - i + 1];
                 //printf("suD: %.0f\n", suD);
-                unordered_set<v_size>::iterator iter;
-                for (iter = shared[{secLast, last}].begin(); iter != shared[{secLast, last}].end(); iter++) {
-                        sumT += dpm[last][*iter][k-i];
+                for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
+                    v_size t = pEdge[j];
+                    if (dpm[secLast][t][1] == 1) {
+                        sumT += dpm[last][t][k-i];
                         if (sumT + 1e-10 >= x * suD) {
-                            //printf("debug *iter: %u\n", *iter);
-                            clique[i] = sortByColor[ *iter ];
-                            prId = *iter;
-                            //printf("break %u\n", i);
+                            clique[i] = sortByColor[ t ];
+                            prId = t;
                             break;
                         }
+                    }
                 }
                 /*
                 for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
