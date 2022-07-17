@@ -217,7 +217,7 @@ struct cccpath {
         if(dpm != nullptr) delete [] dpm;
         for (v_size i = 0; i < g -> degeneracy; i++) {
             for (v_size j = 0; j < g -> degeneracy; j++) {
-                delete [] shared[i][j];
+                delete shared[i][j];
             }
             delete [] shared[i];
         }
