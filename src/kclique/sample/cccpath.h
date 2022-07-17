@@ -154,7 +154,7 @@ struct cccpath {
             }
         }
 
-        shared = new unordered_set<v_size> **[(degen) * (degen)];
+        shared = new unordered_set<v_size> *[(degen) * (degen)];
         for (v_size i = 0; i < (degen) * (degen); i++) {
             shared[i] = new unordered_set<v_size>{};
         }
