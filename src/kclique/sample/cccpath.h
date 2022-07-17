@@ -44,6 +44,7 @@ struct cccpath {
     double * c;
     double *** dpm;
     double * memPool = nullptr;
+    v_size degen;
 
     v_size * pEdge = nullptr;
     v_size * pIdx = nullptr;
@@ -55,7 +56,7 @@ struct cccpath {
     std::default_random_engine e;
     e_size N = 5000000;
     //unordered_map<vector<v_size>, unordered_set<v_size>, container_hash<vector<v_size>>> shared;
-    unordered_set<v_size> *** shared;
+    unordered_set<v_size> ** shared;
 
     void init(v_size sz_, std::vector<v_size> & nodes, e_size N_=5000000) {
         sz = sz_;
@@ -136,28 +137,26 @@ struct cccpath {
     void initForSingleNode(v_size k_, Graph * g_, hopstotchHash * hashTable_) {
         k = k_;
         g = g_;
+        degen = g -> degeneracy;
         hashTable = hashTable_;
         sumW = 0.0;
         suW = 0;
         clique = new v_size[k];
 
-        dpm = new double**[g->degeneracy];
-        memPool = new double[(g->degeneracy) * (g->degeneracy) * (k+1)]();
+        dpm = new double**[degen];
+        memPool = new double[(degen) * (degen) * (k+1)]();
         v_size p = 0;
-        for (v_size i = 0; i < g -> degeneracy; i++) {
-            dpm[i] = new double*[g-> degeneracy];
-            for (v_size j = 0; j < g-> degeneracy; j++) {
+        for (v_size i = 0; i < degen; i++) {
+            dpm[i] = new double*[degen];
+            for (v_size j = 0; j < degen; j++) {
                 dpm[i][j] = memPool + p;
                 p += k + 1;
             }
         }
 
-        shared = new unordered_set<v_size> **[g->degeneracy];
-        for (v_size i = 0; i < g -> degeneracy; i++) {
-            shared[i] = new unordered_set<v_size> *[g->degeneracy];
-            for (v_size j = 0; j < g -> degeneracy; j++) {
-                shared[i][j] = new unordered_set<v_size>{};
-            }
+        shared = new unordered_set<v_size> **[(degen) * (degen)];
+        for (v_size i = 0; i < (degen) * (degen); i++) {
+            shared[i] = new unordered_set<v_size>{};
         }
 /*
         dp = new double*[g->degeneracy];
@@ -215,11 +214,8 @@ struct cccpath {
             delete [] dpm[i];
         }
         if(dpm != nullptr) delete [] dpm;
-        for (v_size i = 0; i < g -> degeneracy; i++) {
-            for (v_size j = 0; j < g -> degeneracy; j++) {
-                delete shared[i][j];
-            }
-            delete [] shared[i];
+        for (v_size i = 0; i < (g -> degeneracy) * (g -> degeneracy); i++) {
+                delete shared[i];
         }
         if (shared != nullptr) delete [] shared;
         if(pEdge != nullptr) delete [] pEdge;
@@ -273,12 +269,12 @@ struct cccpath {
             for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
                 v_size x = pEdge[l];
                 dpm[i][x][2] = 0.0;
-                (*shared[i][x]).clear();
+                (*shared[i * degen + x]).clear();
                 for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
                     v_size t = pEdge[p];
                     if (dpm[i][t][1] == 1) {
                         dpm[i][x][2] = dpm[i][x][2] + dpm[x][t][1];
-                        (*shared[i][x]).insert(t);
+                        (*shared[i * degen + x]).insert(t);
                     }
                 }
             }
@@ -293,7 +289,7 @@ struct cccpath {
                     /*for (auto t: shared[{i,x}]) {
                         dpm[{i, x, j}] = dpm[{i, x, j}] + dpm[{x, t, j-1}];
                     }*/
-                    for (iter = (*shared[i][x]).begin(); iter != (*shared[i][x]).end(); iter++) {
+                    for (iter = (*shared[i * degen + x]).begin(); iter != (*shared[i * degen + x]).end(); iter++) {
                         dpm[i][x][j] = dpm[i][x][j] + dpm[x][*iter][j-1];
                     }
                     /*for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
@@ -387,7 +383,7 @@ struct cccpath {
                 suD = dpm[secLast][last][k - i + 1];
                 //printf("suD: %.0f\n", suD);
                 unordered_set<v_size>::iterator iter;
-                for (iter = (*shared[secLast][last]).begin(); iter != (*shared[secLast][last]).end(); iter++) {
+                for (iter = (*shared[secLast * degen + last]).begin(); iter != (*shared[secLast * degen + last]).end(); iter++) {
                         sumT += dpm[last][*iter][k-i];
                         if (sumT + 1e-10 >= x * suD) {
                             //printf("debug *iter: %u\n", *iter);
