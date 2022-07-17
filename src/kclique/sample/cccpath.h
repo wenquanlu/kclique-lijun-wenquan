@@ -155,6 +155,9 @@ struct cccpath {
         shared = new unordered_set<v_size> **[g->degeneracy];
         for (v_size i = 0; i < g -> degeneracy; i++) {
             shared[i] = new unordered_set<v_size> *[g->degeneracy];
+            for (v_size j = 0; j < g -> degeneracy; j++) {
+                shared[i][j] = new unordered_set<v_size>{};
+            }
         }
 /*
         dp = new double*[g->degeneracy];
@@ -213,6 +216,9 @@ struct cccpath {
         }
         if(dpm != nullptr) delete [] dpm;
         for (v_size i = 0; i < g -> degeneracy; i++) {
+            for (v_size j = 0; j < g -> degeneracy; j++) {
+                delete [] shared[i][j];
+            }
             delete [] shared[i];
         }
         if (shared != nullptr) delete [] shared;
@@ -267,7 +273,7 @@ struct cccpath {
             for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
                 v_size x = pEdge[l];
                 dpm[i][x][2] = 0.0;
-                shared[i][x] = & unordered_set<v_size>{};
+                (*shared[i][x]).clear();
                 for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
                     v_size t = pEdge[p];
                     if (dpm[i][t][1] == 1) {
