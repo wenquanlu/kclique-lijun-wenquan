@@ -447,7 +447,7 @@ printf("|%u| %.1f| %lu", k, alpha, N);
         double sampleCnt_ = scpObj->sample(nodes, N, exCnt - exactCnt);
         // double sampleCntMultiLayer = scpObj->sampleMultilayer(nodes, N);
         
-        printf("|s %f", (exCnt - exactCnt) / scpObj->sumW);
+        printf("|s %f", (exCnt - exactCnt) / scpObj->suW);
         double t1 = clock();
         // printf("ccpath sample times %fs\n", (t1 - t)/CLOCKS_PER_SEC);
         double totalCnt = exactCnt + sampleCnt_;

@@ -12,36 +12,25 @@
 #include <vector>
 #include <algorithm>
 #include <random>
-#include <unordered_map>
-#include <boost/functional/hash.hpp>
 #include <unordered_set>
 
 using Pair = std::pair<v_size, v_size>;
 using std::vector;
-using std::unordered_map;
 using std::unordered_set;
 
 // constexpr v_size batchSize = 50;
-
-template <typename Container> // we can make this generic for any container [1]
-struct container_hash {
-    std::size_t operator()(Container const& c) const {
-        return boost::hash_range(c.begin(), c.end());
-    }
-};
 
 struct cccpath {
     v_size sz; //sz is the size of S
     Graph * g;
     hopstotchHash * hashTable;
     v_size k;
-    double * experiments;
     double * exp;
-    double sumW;
     double ** dp;
-    double * memoryPool = nullptr;
     double suW;
     double * c;
+    double *** dpm;
+    double * memPool = nullptr;
 
     v_size * pEdge = nullptr;
     v_size * pIdx = nullptr;
@@ -52,13 +41,10 @@ struct cccpath {
     v_size * clique = nullptr;
     std::default_random_engine e;
     e_size N = 5000000;
-    unordered_map<vector<v_size>, double, container_hash<vector<v_size>>> dpm;
-    unordered_map<vector<v_size>, unordered_set<v_size>, container_hash<vector<v_size>>> shared;
 
     void init(v_size sz_, std::vector<v_size> & nodes, e_size N_=5000000) {
         sz = sz_;
         N = N_;
-        experiments = new double[sz];
         exp = new double[sz];
 
         // auto cmp = [&](v_size a, v_size b) {
@@ -105,30 +91,16 @@ struct cccpath {
 
             for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                    suD += dpm[{i, pEdge[l], k-1}];
+                    suD += dpm[i][pEdge[l]][k-1];
                 }
             }
 
-            ////////////////spot error use///////////////
-            /*double ccc = 0;
-            if (i == 0) {
-                ccc = 0;
-                for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                    ccc += dpm[{i, pEdge[l], k}];
-                }
-                printf("ccc[0]: %.0f\n", ccc);
-            }*/
-            ///////////////////////////////////////////////
-
-            //experiments[i] = sumD; // experiments[i] stores the total number of k-paths in the graph sum(dp[i][k])
+            // exp[i] stores the total number of k-paths in the graph sum(dp[i][k])
 
             exp[i] = suD;
             suW += suD;
             //sumW += sumD; // sumW is the total number of k-paths in S
-            dpm.clear();
-            shared.clear();
         }
-        //printf("finished those loops\n");
         if (sortByColor != nullptr) delete [] sortByColor;
     }
 
@@ -137,23 +109,20 @@ struct cccpath {
         k = k_;
         g = g_;
         hashTable = hashTable_;
-        sumW = 0.0;
         suW = 0;
         clique = new v_size[k];
-/*
-        dp = new double*[g->degeneracy];
-        memoryPool = new double[g->degeneracy * (k+1)]();
+
+        dpm = new double**[g->degeneracy];
+        memPool = new double[(g->degeneracy) * (g->degeneracy) * (k+1)]();
         v_size p = 0;
-        for(v_size i = 0; i < g->degeneracy; i++) {
-            dp[i] = memoryPool + p;
-            p += k + 1;
+        for (v_size i = 0; i < g -> degeneracy; i++) {
+            dpm[i] = new double*[g-> degeneracy];
+            for (v_size j = 0; j < g-> degeneracy; j++) {
+                dpm[i][j] = memPool + p;
+                p += k + 1;
+            }
         }
 
-        for(v_size i = 0; i < g->degeneracy; i++) {
-            dp[i][0] = 0;
-            dp[i][1] = 1;
-        }
-*/
         pEdge = new v_size[g->degeneracy*g->degeneracy];
         pIdx = new v_size[g->degeneracy + 1];
         sortByColor = new v_size[g->degeneracy + 1];
@@ -187,10 +156,13 @@ struct cccpath {
     // }
 
     ~cccpath() {
-        if(experiments != nullptr) delete [] experiments;
         if (exp != nullptr) delete [] exp;
-        if(memoryPool != nullptr) delete [] memoryPool;
         if(dp != nullptr) delete [] dp;
+        if (memPool != nullptr) delete [] memPool;
+        for (v_size i = 0; i < g -> degeneracy; i++) {
+            delete [] dpm[i];
+        }
+        if(dpm != nullptr) delete [] dpm;
         if(pEdge != nullptr) delete [] pEdge;
         if(pIdx != nullptr) delete [] pIdx;
         // if(sortByColor != nullptr) delete [] sortByColor;
@@ -234,66 +206,25 @@ struct cccpath {
 
         for (v_size i = 0; i < outDegree; i++) {
             for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                    dpm[{i, pEdge[l], 1}] = 1;
+                    dpm[i][pEdge[l]][1] = 1;
                 }
         }
 
-        for (v_size i = 0; i < outDegree; i++) {
-            for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                v_size x = pEdge[l];
-                for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
-                    v_size t = pEdge[p];
-                    if (dpm[{i, t, 1}] == 1) {
-                        dpm[{i, x, 2}] = dpm[{i, x, 2}] + dpm[{x, t, 1}];
-                        if (shared.find({i,x}) == shared.end()) {
-                            // if key does not exsit
-                            shared[{i,x}] = unordered_set<v_size>{t};
-                        } else {
-                            // if key exists
-                            shared[{i,x}].insert(t);
-                        }
-                    }
-                }
-            }
-        }
 
-        for (v_size j = 3; j < k; j++) {
+        for (v_size j = 2; j < k; j++) {
             for (v_size i = 0; i < outDegree; i++) {
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
                     v_size x = pEdge[l];
-                    unordered_set<v_size>::iterator iter;
-                    /*for (auto t: shared[{i,x}]) {
-                        dpm[{i, x, j}] = dpm[{i, x, j}] + dpm[{x, t, j-1}];
-                    }*/
-                    for (iter = shared[{i,x}].begin(); iter != shared[{i,x}].end(); iter++) {
-                        dpm[{i, x, j}] = dpm[{i, x, j}] + dpm[{x, *iter, j-1}];
-                    }
-                    /*for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
+                    dpm[i][x][j] = 0.0;
+                    for (v_size p = pIdx[x]; p < pIdx[x + 1]; p++) {
                         v_size t = pEdge[p];
-                        if (dpm[{i, t, 1}] == 1) {
-                            dpm[{i, x, j}] = dpm[{i, x, j}] + dpm[{x, t, j-1}];
+                        if (dpm[i][t][1] == 1) {
+                            dpm[i][x][j] = dpm[i][x][j] + dpm[x][t][j-1];
                         }
-                    }*/
+                    }    
                 }
             }
         }
-
-
-
-
-/*    
-        for(v_size j = 2; j <= k; j++) {
-            for(v_size i = 0; i < outDegree; i++) {
-                dp[i][j] = 0.0;
-                for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                    // for out-neighbour of v_i 
-                    // a out-neighbour is pEdge[l]
-
-                    dp[i][j] += dp[pEdge[l]][j - 1];
-                }
-            }
-        }
-*/
     }
 
     // sortByColor a mapping of rank v_i to actual node id (the value of entry)
@@ -302,7 +233,6 @@ struct cccpath {
         v_size preId = -1;
         v_size prId = -1;
 
-        double sumD = experiments[id];
         double x = -1; // get a random double
 
         double suD = exp[id];
@@ -341,47 +271,28 @@ struct cccpath {
             } else if (i == 1) {
                 sumT = 0;
                 suD = c[last];
-                //printf("Iter1: secLast: %u, last: %u\n", secLast, last);
-                //printf("suD: %.0f\n", suD);
                 for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
-                    sumT += dpm[{last, pEdge[j], k-1}];
-                    //printf("sumT: %.0f, dpm: %.0f\n", sumT, dpm[{last, pEdge[j], k-i}]);
+                    sumT += dpm[last][pEdge[j]][k-1];
                     if (sumT + 1e-10 >= x * suD) {
                         clique[1] = sortByColor[ pEdge[j] ];
                         prId = pEdge[j];
-                        //printf("break 1\n");
                         break;
                     }
                 }
             } else {
                 sumT = 0;
-                //printf("Iter>1: secLast: %u, last: %u\n", secLast, last);
-                suD = dpm[{secLast, last, k - i + 1}];
-                //printf("suD: %.0f\n", suD);
-                unordered_set<v_size>::iterator iter;
-                for (iter = shared[{secLast, last}].begin(); iter != shared[{secLast, last}].end(); iter++) {
-                        sumT += dpm[{last, *iter, k-i}];
+                suD = dpm[secLast][last][k - i + 1];
+                for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
+                    v_size t = pEdge[j];
+                    if (dpm[secLast][t][1] == 1) {
+                        sumT += dpm[last][t][k-i];
                         if (sumT + 1e-10 >= x * suD) {
-                            //printf("debug *iter: %u\n", *iter);
-                            clique[i] = sortByColor[ *iter ];
-                            prId = *iter;
-                            //printf("break %u\n", i);
+                            clique[i] = sortByColor[ t ];
+                            prId = t;
                             break;
                         }
-                }
-                /*
-                for (v_size j = pIdx[last]; j < pIdx[last + 1]; j++) {
-                    sumT += dpm[{last, pEdge[j], k-i}];
-                    //printf("sumT: %.0f, dpm: %.0f\n", sumT, dpm[{last, pEdge[j], k-i}]);
-                    if (sumT + 1e-10 >= x * suD) {
-                        //printf("pEdge[j]: %u\n", pEdge[j]);
-                        clique[i] = sortByColor[ pEdge[j] ];
-                        prId = pEdge[j];
-                        //printf("break %u\n", i);
-                        break;
                     }
-                }*/
-
+                }
             }
 
             if (i >= 1) {
@@ -469,29 +380,18 @@ struct cccpath {
             for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
                 c[i] = 0;
                 for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                    c[i] += dpm[{i, pEdge[l], k-1}]; // k - 1 here, very important
+                    c[i] += dpm[i][pEdge[l]][k-1]; // k - 1 here, very important
                 }
-                //printf("c[%u]: %.0f\n", i, c[i]);
             }
-
-            /*(if (i == 0) {
-                printf("c[0] check later: %.0f\n",c[0]);
-            }*/
-
-            //printf("si: %u\n", i);
-            //fflush(stdout);
 
             v_size tt = 0;
             for(v_size j = 0; j < expectedSampleTime; j++) {
                 tt += sampleOneTime(i, u, uiDistribution);
             }
             t += tt;
-            //ans += 1.0*tt/expectedSampleTime*experiments[i];
             ans += 1.0*tt/expectedSampleTime*exp[i];
             sampleTotalTimes += expectedSampleTime;
             if(c != nullptr) delete [] c;
-            dpm.clear();
-            shared.clear();
         }
         
         if(sampleTotalTimes < sampleTimes) {
@@ -510,7 +410,7 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
                   for(v_size i = 0; i < g->pIdx[u+1] - g->pIdx2[u]; i++) {
                       c[i] = 0;
                       for(v_size l = pIdx[i]; l < pIdx[i + 1]; l++) {
-                          c[i] += dpm[{i, pEdge[l], k-1}]; // k - 1 here, very important
+                          c[i] += dpm[i][pEdge[l]][k-1]; // k - 1 here, very important
                       }
                         //printf("c[%u]: %.0f\n", i, c[i]);
                   }
@@ -518,8 +418,6 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
                   t += sampleOneTime(id, u, uiDistribution);
                   sampleTotalTimes++;
                   if(c != nullptr) delete [] c;
-                  dpm.clear();
-                  shared.clear();
               }
              // printf("|small %.6f %u %u", 1.0 * t / sampleTotalTimes, t, sampleTotalTimes);
              // return 1.0 * t / sampleTotalTimes * sumW;
@@ -530,11 +428,8 @@ printf("|not expected %llu ", sampleTimes - sampleTotalTimes);
         // printf("sample rate %f\n", 1.0 * t / sampleTimes);
         printf("| %.6f %u %u", 1.0 * t / sampleTotalTimes, t, sampleTotalTimes);
         // printf("| %.8f", expectedN / sumW);
-        // if(c != nullptr) delete [] c;
-        //return 1.0 * t / sampleTotalTimes * sumW;
         printf("| t: %u, sampleTotalTimes: %u, suW: %.0f\n", t, sampleTotalTimes, suW);
         return 1.0 * t / sampleTotalTimes * suW;
-        //return ans;
     }
 };
 
